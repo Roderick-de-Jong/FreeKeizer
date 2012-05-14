@@ -1,6 +1,7 @@
-GCC = g++
+CC = g++
 CFLAGS = -Wall -Wextra -ggdb
 LINKFLAGS = -ggdb
+RM = rm
 
 SRC_DIR = src
 BIN_DIR = bin
@@ -15,16 +16,16 @@ MISC_MODULES = $(BIN_DIR)/KeizerIO.o
 all: $(BIN_DIR)/FreeKeizer $(BIN_DIR)/Unittest $(BIN_DIR)/GAtest
 
 $(BIN_DIR)/FreeKeizer: $(BIN_DIR)/FreeKeizer.o $(COMPETITIE_DATASTRUCTURES_MODULES) $(MISC_MODULES)
-	g++ $(LINKFLAGS) -o $(BIN_DIR)/FreeKeizer $(BIN_DIR)/FreeKeizer.o $(COMPETITIE_DATASTRUCTURES_MODULES) $(MISC_MODULES)
+	$(CC) $(LINKFLAGS) -o $(BIN_DIR)/FreeKeizer $(BIN_DIR)/FreeKeizer.o $(COMPETITIE_DATASTRUCTURES_MODULES) $(MISC_MODULES)
 
 $(BIN_DIR)/Unittest: $(BIN_DIR)/Unittest.o  $(COMPETITIE_DATASTRUCTURES_MODULES) $(MISC_MODULES)
-	g++ $(LINKFLAGS) -o $(BIN_DIR)/Unittest $(BIN_DIR)/Unittest.o  $(COMPETITIE_DATASTRUCTURES_MODULES) $(MISC_MODULES)
+	$(CC) $(LINKFLAGS) -o $(BIN_DIR)/Unittest $(BIN_DIR)/Unittest.o  $(COMPETITIE_DATASTRUCTURES_MODULES) $(MISC_MODULES)
 
 $(BIN_DIR)/GAtest: $(BIN_DIR)/GAtest.o $(BIN_DIR)/GeneticAlgorithm.o
-	g++ $(LINKFLAGS) -o $(BIN_DIR)/GAtest $(BIN_DIR)/GAtest.o $(BIN_DIR)/GeneticAlgorithm.o
+	$(CC) $(LINKFLAGS) -o $(BIN_DIR)/GAtest $(BIN_DIR)/GAtest.o $(BIN_DIR)/GeneticAlgorithm.o
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(GCC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 clean:
-	rm $(BIN_DIR)/*.o
+	$(RM) $(BIN_DIR)/*.o
