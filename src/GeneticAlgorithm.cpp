@@ -22,12 +22,13 @@ GeneticAlgorithm<T_GENOTYPE, T_GENE>::~GeneticAlgorithm()
 	_populationFitness.clear();
 	_oldPopulation.clear();
 	_oldPopulationFitness.clear();
-	_fitnessFunction = NULL;
 	_selectionPercentage = 0.0;
 }
 
 template<template<class> class T_GENOTYPE, class T_GENE>
-void GeneticAlgorithm<T_GENOTYPE, T_GENE>::seed(const std::vector<T_GENOTYPE<T_GENE> >& initialPopulation, double (*fitnessFunction)(T_GENOTYPE<T_GENE>), const double selectionPercentage)
+void GeneticAlgorithm<T_GENOTYPE, T_GENE>::seed(const std::vector<T_GENOTYPE<T_GENE> >& initialPopulation,
+                                                std::auto_ptr<FitnessFunction<T_GENOTYPE, T_GENE> > fitnessFunction,
+                                                const double selectionPercentage)
 {
 	_population = initialPopulation;
 	_oldPopulation.clear();
@@ -47,7 +48,7 @@ void GeneticAlgorithm<T_GENOTYPE, T_GENE>::calculateFitnessValues()
 	typename std::vector<T_GENOTYPE<T_GENE> >::iterator genotype;
 	for(genotype = _population.begin(); genotype != _population.end(); genotype++)
 	{
-		double fitness = _fitnessFunction(*genotype);
+		double fitness = _fitnessFunction->calculateFitness(*genotype);
 		_populationFitness.push_back(fitness);
 	}
 }

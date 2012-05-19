@@ -1,8 +1,73 @@
 #ifndef GENETIC_ALGORITHM_H
 #define GENETIC_ALGORITHM_H
 
+#include <memory>
 #include <vector>
 
+// USAGE:
+// - Create a starting population:
+//   Fill a std::vector<Genotype<x>> with individuals. You can choose class x to suit your problem set, or even create a custom Genotype subclass.
+//
+// - Create a fitness function:
+//   Subclass FitnessFunction and implement its calculateFitness() method according to your needs.
+//
+// - Create a GeneticAlgorithm object
+//   Instantiate a GeneticAlgorithm<Genotype, x> and call its seed() function with your initial population and your fitness function.
+//
+// - Start evolving potential solutions!
+//   Do some calls to the GeneticAlgorithm's createNextGeneration() method.
+
+
+
+/**
+ * Abstract base class for genotype fitness calculators.
+ */
+template<template<class> class T_GENOTYPE, class T_GENE>
+class FitnessFunction
+{
+	public:
+	FitnessFunction() {}
+	virtual ~FitnessFunction() {}
+	
+	virtual double calculateFitness(const T_GENOTYPE<T_GENE>& genotype) = 0;
+};
+
+
+
+/**
+ * Abstract base class for various crossover implementations.
+ */
+template<template<class> class T_GENOTYPE, class T_GENE>
+class Crossover
+{
+	public:
+	Crossover() {}
+	virtual ~Crossover() {}
+};
+
+
+
+/**
+ * Abstract base class for various mutation functions.
+ * @see http://en.wikipedia.org/wiki/Mutation_%28genetic_algorithm%29
+ */
+template<template<class> class T_GENOTYPE, class T_GENE>
+class MutationFunction
+{
+	public:
+	MutationFunction() {}
+	virtual ~MutationFunction() {}
+	
+	
+};
+
+
+
+/**
+ * Encompasses everything needed to apply a Genetic Algorithm to a particular problem.
+ * Provide a population and a fitness function, and this class will do the rest.
+ * @see http://en.wikipedia.org/wiki/Genetic_algorithm
+ */
 template<template<class> class T_GENOTYPE, class T_GENE>
 class GeneticAlgorithm
 {
@@ -23,15 +88,24 @@ class GeneticAlgorithm
 		const std::vector<double>* _fitnesses;
 	};
 	
+	/**
+	 * Default constructor. Creates an empty GeneticAlgorithm. You'll need to set an initial population and
+	 * provide a fitness function before you can do anything useful with the object created by this constructor.
+	 */
 	GeneticAlgorithm();
+	
 	virtual ~GeneticAlgorithm();
 	
 	/**
 	 * Initializes the Genetic Algorithm, setting the population to the genotypes contained in initialPopulation,
 	 * accepting the fitness function to be used for selection, and clearing any pre-existing data concerning
 	 * the last generation and any fitness values.
+	 * 
+	 * @param fitnessFunction A pointer to an object of class FitnessFunction. The GeneticAlgorithm takes ownership of the object.
 	 */
-	virtual void seed(const std::vector<T_GENOTYPE<T_GENE> >& initialPopulation, double (*fitnessFunction)(T_GENOTYPE<T_GENE>), const double selectionPercentage);
+	virtual void seed(const std::vector<T_GENOTYPE<T_GENE> >& initialPopulation,
+	                  std::auto_ptr<FitnessFunction<T_GENOTYPE, T_GENE> > fitnessFunction,
+	                  const double selectionPercentage);
 	
 	/**
 	 * Calculates the fitness value for each of the genotypes in the current population
@@ -113,7 +187,7 @@ class GeneticAlgorithm
 	/**
 	 * The fitness function to be applied to the genotypes.
 	 */
-	double (*_fitnessFunction)(T_GENOTYPE<T_GENE>);
+	std::auto_ptr<FitnessFunction<T_GENOTYPE, T_GENE> > _fitnessFunction;
 	
 	/**
 	 * The top percentage of the population (in terms of fitness) that will be selected for procreation.
@@ -128,6 +202,7 @@ class GeneticAlgorithm
 
 /**
  * Representation of the genetic data of one individual candidate solution.
+ * The T_GENE template parameter should be either a basic type, or a class with an assignment operator.
  */
 template<typename T_GENE>
 class Genotype
@@ -173,6 +248,8 @@ class Genotype
 	 * crossoverPattern a vector indicating which parent to take each gene from. For any gene index, a value of false means using this genotype's gene, a value of true means using the other parent's gene.
 	 * geneMutationProbabilities indicates the individual mutation rate for each gene. Each value has to be in range [0;1], where 0 means no chance of mutation, and 1 means guaranteed mutation.
 	 *
+	 * TODO: replace with crossover classes
+	 * 
 	 * Exceptions:
 	 * std::invalid_argument if otherParent doesn't have the same number of genes as this genotype.
 	 */

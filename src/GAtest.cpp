@@ -16,17 +16,27 @@ char createRandomLetter(char gene = ' ')
 	return gene;
 }
 
-// Defines fitness roughly as "how well sorted (ascending) are the characters?"
-double calculateFitness(Genotype<char> genotype)
+
+/**
+ * Defines fitness roughly as "how well sorted (ascending) are the characters?"
+ */
+class AlphOrderFitnessFunction : public FitnessFunction<Genotype, char>
 {
-	int fitness = 0;
-	for(unsigned int i = 0; i < genotype.getGeneCount() - 1; i++)
+	public:
+	AlphOrderFitnessFunction() {}
+	virtual ~AlphOrderFitnessFunction() {}
+	
+	virtual double calculateFitness(const Genotype<char>& genotype)
 	{
-		if(genotype.getGeneAt(i) < genotype.getGeneAt(i + 1))
-			fitness++;
+		int fitness = 0;
+		for(unsigned int i = 0; i < genotype.getGeneCount() - 1; i++)
+		{
+			if(genotype.getGeneAt(i) < genotype.getGeneAt(i + 1))
+				fitness++;
+		}
+		return double(fitness) / genotype.getGeneCount();
 	}
-	return double(fitness) / genotype.getGeneCount();
-}
+};
 
 void printPopulation(const vector<Genotype<char> >& population, const vector<double>& fitness)
 {
@@ -79,6 +89,7 @@ int main(void)
 	double selectionPercentage = 0.30;
 	int maxGeneration = 10;
 	vector<Genotype<char> > initialPopulation;
+	std::auto_ptr<FitnessFunction<Genotype, char> > fitnessFunction(new AlphOrderFitnessFunction());
 
 	cout << "Seeding initial population..." << endl;
 	srand(time(NULL));
@@ -93,7 +104,7 @@ int main(void)
 		Genotype<char> individual = Genotype<char>(genes, &createRandomLetter);
 		initialPopulation.push_back(individual);
 	}
-	ga.seed(initialPopulation, &calculateFitness, selectionPercentage);
+	ga.seed(initialPopulation, fitnessFunction, selectionPercentage);
 
 	cout << "Starting genetic algorithm..." << endl;;
 	int generation;
