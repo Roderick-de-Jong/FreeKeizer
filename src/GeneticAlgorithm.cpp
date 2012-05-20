@@ -25,6 +25,38 @@
 
 #include "GeneticAlgorithm.h"
 
+
+
+///// SimpleCrossover implementation /////
+
+template<template<class> class T_GENOTYPE, class T_GENE>
+T_GENOTYPE<T_GENE> SimpleCrossover<T_GENOTYPE, T_GENE>::createChild(const std::vector<T_GENOTYPE<T_GENE> >& parents)
+{
+	if(parents.size() == 0)
+		throw std::invalid_argument("createChild(): No parents given.");
+	
+	unsigned int geneCount = parents.at(0).getGeneCount();
+	std::vector<T_GENE> childGenes;
+	
+	// Figure out how many genes will come from each parent
+	unsigned int genesPerParent = geneCount / parents.size();
+	// If the genotype length isn't an exact multiple of the number of parents, then the first X parents will each give 1 extra gene:
+	unsigned int parentsGivingExtraGene = geneCount % parents.size();
+	
+	for(unsigned int p = 0; p < parents.size(); p++)
+	{
+		unsigned int genesFromThisParent = genesPerParent + (p < parentsGivingExtraGene ? 1 : 0);
+		for(unsigned int g = 0; g < genesFromThisParent; g++)
+		{
+			childGenes.push_back(parents.at(p).getGeneAt(g));
+		}
+	}
+	
+	return T_GENOTYPE<T_GENE>(childGenes, parents.at(0)._mutationFunction);
+}
+
+
+
 ///// GeneticAlgorithm implementation
 
 template<template<class> class T_GENOTYPE, class T_GENE>

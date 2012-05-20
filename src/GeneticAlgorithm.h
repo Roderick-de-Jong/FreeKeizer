@@ -75,6 +75,24 @@ class Crossover
 
 
 /**
+ * Simple crossover system, using equal length parts of each parent's genotype.
+ */
+template<template<class> class T_GENOTYPE, class T_GENE>
+class SimpleCrossover : public Crossover<T_GENOTYPE, T_GENE>
+{
+	public:
+	SimpleCrossover() { Crossover<T_GENOTYPE, T_GENE>(); }
+	virtual ~SimpleCrossover() {}
+	
+	/**
+	 * @see Crossover::createChild
+	 */
+	virtual T_GENOTYPE<T_GENE> createChild(const std::vector<T_GENOTYPE<T_GENE> >& parents);
+};
+
+
+
+/**
  * Abstract base class for various mutation functions.
  * @see http://en.wikipedia.org/wiki/Mutation_%28genetic_algorithm%29
  */
@@ -237,6 +255,8 @@ class GeneticAlgorithm
 template<typename T_GENE>
 class Genotype
 {
+	friend class Crossover<Genotype, T_GENE>;
+	
 	public:
 	/**
 	 * Creates a Genotype for the given genes, storing the mutation function provided for its reproduction.
