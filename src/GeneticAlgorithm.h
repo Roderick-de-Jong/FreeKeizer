@@ -1,6 +1,25 @@
 #ifndef GENETIC_ALGORITHM_H
 #define GENETIC_ALGORITHM_H
 
+/*************************************************************************
+ * Copyright 2012 Roderick de Jong                                       *
+ *                                                                       *
+ * This file is part of the FreeKeizer project.                          *
+ * FreeKeizer is free software: you can redistribute it and/or modify    *
+ * it under the terms of the GNU General Public License as published by  *
+ * the Free Software Foundation, either version 3 of the License, or     *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ * FreeKeizer is distributed in the hope that it will be useful,         *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ * GNU General Public License for more details.                          *
+ *                                                                       *
+ * You should have received a copy of the GNU General Public License     *
+ * along with FreeKeizer.  If not, see <http://www.gnu.org/licenses/>.   *
+ *                                                                       *
+ *************************************************************************/
+
 #include <memory>
 #include <vector>
 
@@ -21,6 +40,7 @@
 
 /**
  * Abstract base class for genotype fitness calculators.
+ * @see http://en.wikipedia.org/wiki/Fitness_function
  */
 template<template<class> class T_GENOTYPE, class T_GENE>
 class FitnessFunction
@@ -43,6 +63,13 @@ class Crossover
 	public:
 	Crossover() {}
 	virtual ~Crossover() {}
+	
+	/**
+	 * Creates a child genotype based on the genotypes of any positive number of parents.
+	 * @param parents A vector of size 1 or larger containing the parent genotypes.
+	 *                The number of parents depends on the GeneticAlgorithm's parents-per-child setting.
+	 */
+	virtual T_GENOTYPE<T_GENE> createChild(const std::vector<T_GENOTYPE<T_GENE> >& parents) = 0;
 };
 
 
@@ -58,7 +85,10 @@ class MutationFunction
 	MutationFunction() {}
 	virtual ~MutationFunction() {}
 	
-	
+	/**
+	 * Mutates the given genotype.
+	 */
+	virtual void mutate(T_GENOTYPE<T_GENE>& genotype) = 0;
 };
 
 
