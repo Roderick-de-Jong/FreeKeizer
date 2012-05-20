@@ -29,13 +29,6 @@
 
 using namespace std;
 
-char createRandomLetter(char gene = ' ')
-{
-	gene = 'a' + char(rand() % 26); // not very random, but good enough for this purpose
-	return gene;
-}
-
-
 /**
  * Defines fitness roughly as "how well sorted (ascending) are the characters?"
  */
@@ -54,6 +47,27 @@ class AlphOrderFitnessFunction : public FitnessFunction<Genotype, char>
 				fitness++;
 		}
 		return double(fitness) / genotype.getGeneCount();
+	}
+};
+
+char createRandomLetter()
+{
+	return 'a' + char(rand() % 26); // not very random, but good enough for this purpose
+}
+
+/**
+ * Mutates genes by generating random letters.
+ */
+class MyMutation : public UniformMutationFunction<Genotype, char>
+{
+	public:
+	MyMutation() : UniformMutationFunction<Genotype, char>() {}
+	MyMutation(const double mutationRate) : UniformMutationFunction<Genotype, char>(mutationRate) {}
+	virtual ~MyMutation() {}
+	
+	virtual char mutate(const char& gene)
+	{
+		return createRandomLetter();
 	}
 };
 
@@ -102,14 +116,20 @@ void printPopulationStatistics(const vector<Genotype<char> >& population, const 
 
 int main(void)
 {
-	GeneticAlgorithm<Genotype, char> ga;
-	int genotypeLength = 12;
-	int populationSize = 20;
-	double selectionPercentage = 0.30;
-	int maxGeneration = 10;
+	const int genotypeLength = 12;
+	const int populationSize = 20;
+	const double selectionPercentage = 0.30;
+	const int maxGeneration = 10;
+	const double mutationRate = 0.05; // 5% chance each gene
+	
+	cout << "GAtest" << endl;
+	
 	vector<Genotype<char> > initialPopulation;
 	std::auto_ptr<FitnessFunction<Genotype, char> > fitnessFunction(new AlphOrderFitnessFunction());
-
+	std::auto_ptr<Crossover<Genotype, char> > crossover(new SimpleCrossover<Genotype, char>());
+	std::auto_ptr<MutationFunction<Genotype, char> > mutationFunction(new MyMutation(mutationRate));
+	GeneticAlgorithm<Genotype, char> ga;
+	
 	cout << "Seeding initial population..." << endl;
 	srand(time(NULL));
 	for(int i = 0; i < populationSize; i++)
@@ -120,16 +140,16 @@ int main(void)
 			char c = createRandomLetter();
 			genes.push_back(c);
 		}
-		Genotype<char> individual = Genotype<char>(genes, &createRandomLetter);
+		Genotype<char> individual = Genotype<char>(genes);
 		initialPopulation.push_back(individual);
 	}
-	ga.seed(initialPopulation, fitnessFunction, selectionPercentage);
+	ga.seed(initialPopulation, fitnessFunction, crossover, mutationFunction, selectionPercentage);
 
 	cout << "Starting genetic algorithm..." << endl;;
 	int generation;
 	for(generation = 0; generation < maxGeneration; generation++)
 	{
-	  cout << "GENERATION " << generation << ":" << endl;
+		cout << "GENERATION " << generation << ":" << endl;
 		ga.calculateFitnessValues();
 		vector<Genotype<char> > population = ga.getPopulation();
 		vector<double> populationFitness = ga.getPopulationFitness();
@@ -151,10 +171,4 @@ int main(void)
 	
 	return 0;
 }
-
-
-// Import template implementation, for lack of EXPORT keyword support
-// SHOULD NO LONGER BE NECESSARY BECAUSE OF GeneticAlgorithmTemplInst.h !!
-//#include "GeneticAlgorithm.cpp"
-
 

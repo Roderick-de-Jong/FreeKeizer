@@ -25,7 +25,11 @@
 // Request instantion of the following template classes:
 template class FitnessFunction<Genotype, char>;
 template class MutationFunction<Genotype, char>;
+template class UniformMutationFunction<Genotype, char>;
 template class Crossover<Genotype, char>;
+template class SimpleCrossover<Genotype, char>;
 template class GeneticAlgorithm<Genotype, char>;
+
+// TODO: make a macro for the above...
 
 #endif /* GENETIC_ALGORITHM_TEMPLINST_H */

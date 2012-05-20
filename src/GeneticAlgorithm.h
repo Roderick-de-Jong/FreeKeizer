@@ -76,12 +76,20 @@ class Crossover
 
 /**
  * Simple crossover system, using equal length parts of each parent's genotype.
+ * Requires that parents all have the same genotype length!
+ * 
+ * With genotype length N and P parents, the first P mod N parents will donate
+ * P / N + 1 genes each (integer division!), and the remaining parents will each
+ * donate P / N genes (again integer division).
+ * 
+ * Parents donate genes in the order as they appear in the parents vector supplied
+ * to the createChild method.
  */
 template<template<class> class T_GENOTYPE, class T_GENE>
 class SimpleCrossover : public Crossover<T_GENOTYPE, T_GENE>
 {
 	public:
-	SimpleCrossover() { Crossover<T_GENOTYPE, T_GENE>(); }
+	SimpleCrossover() {}
 	virtual ~SimpleCrossover() {}
 	
 	/**
@@ -107,6 +115,56 @@ class MutationFunction
 	 * Mutates the given genotype.
 	 */
 	virtual void mutate(T_GENOTYPE<T_GENE>& genotype) = 0;
+};
+
+
+
+/**
+ * Simple uniform mutation, using a fixed mutation rate that is applied to each gene.
+ * Usage: create a subclass and implement mutate(gene), call setMutationRate
+ *        and then calls can be made to mutate(genotype).
+ */
+template<template<class> class T_GENOTYPE, class T_GENE>
+class UniformMutationFunction : public MutationFunction<T_GENOTYPE, T_GENE>
+{
+	public:
+	UniformMutationFunction() : _mutationRate(0) {}
+	UniformMutationFunction(const double mutationRate) : _mutationRate(mutationRate) {}
+	virtual ~UniformMutationFunction() {}
+	
+	/**
+	 * Retrieves the current mutation rate.
+	 * @see setMutationRate
+	 * @return The mutation rate, range [0;1].
+	 */
+	virtual double getMutationRate() { return _mutationRate; }
+	
+	/**
+	 * Sets the mutation rate per gene to be used.
+	 * The mutation rate is the chance for any given gene to be mutated during a call to mutate(genotype).
+	 * @param newRate The mutation rate, valid range is [0;1] where 0 means 'never mutate' and 1 means 'always mutate'.
+	 */
+	virtual void setMutationRate(double newRate);
+	
+	/**
+	 * @see MutationFunction::mutate
+	 * Implementation: for each gene, calls mutate(gene) with chance _mutationRate.
+	 */
+	virtual void mutate(T_GENOTYPE<T_GENE>& genotype);
+	
+	/**
+	 * Mutates a single gene.
+	 * Provide your own implementation of this.
+	 */
+	virtual T_GENE mutate(const T_GENE& gene) = 0;
+	
+	protected:
+	
+	/**
+	 * The mutation rate per gene.
+	 * @see getMutationRate
+	 */
+	double _mutationRate;
 };
 
 
@@ -153,6 +211,8 @@ class GeneticAlgorithm
 	 */
 	virtual void seed(const std::vector<T_GENOTYPE<T_GENE> >& initialPopulation,
 	                  std::auto_ptr<FitnessFunction<T_GENOTYPE, T_GENE> > fitnessFunction,
+	                  std::auto_ptr<Crossover<T_GENOTYPE, T_GENE> > crossover,
+	                  std::auto_ptr<MutationFunction<T_GENOTYPE, T_GENE> > mutationFunction,
 	                  const double selectionPercentage);
 	
 	/**
@@ -189,27 +249,6 @@ class GeneticAlgorithm
 	virtual std::vector<unsigned int> _getIndicesOfTopFitnesses(const unsigned int count, const std::vector<double>& fitnesses);
 	
 	/**
-	 * Creates a simple crossover pattern of length geneCount and a single crossover point, before which the crossover pattern will be filled
-	 * with startValue and after which the crossover pattern will be filled with !startValue.
-	 *
-	 * Formally:
-	 * crossoverPoint <= 0              the entire vector will be filled with !startValue
-	 * crossoverPoint >= geneCount      the entire vector will be filled with startValue
-	 * 0 < crossoverPoint < geneCount   elements [0;crossoverPoint> will be filled with startValue, elements [crossoverPoint;geneCount> will be
-	 *                                  filled with !startValue
-	 * 
-	 * Parameters:
-	 * geneCount The size of the required vector<bool>. Has to be greater than zero.
-	 * crossoverPoint The first index where !startValue is to be used rather than startValue.
-	 * startValue The value to start filling the crossover pattern with until index crossoverPoint is reached.
-	 *
-	 * Returns:
-	 * A crossover pattern as described above.
-	 */
-	virtual std::vector<bool> _createSinglePointCrossover(const unsigned int geneCount, const unsigned int crossoverPoint, const bool startValue);
-	
-	
-	/**
 	 * The current genotype population.
 	 */
 	std::vector<T_GENOTYPE<T_GENE> > _population;
@@ -238,6 +277,16 @@ class GeneticAlgorithm
 	std::auto_ptr<FitnessFunction<T_GENOTYPE, T_GENE> > _fitnessFunction;
 	
 	/**
+	 * The object that takes care of (a)sexual reproduction.
+	 */
+	std::auto_ptr<Crossover<T_GENOTYPE, T_GENE> > _crossover;
+	
+	/**
+	 * The mutation function to be applied to newly created genotypes during reproduction.
+	 */
+	std::auto_ptr<MutationFunction<T_GENOTYPE, T_GENE> > _mutationFunction;
+	
+	/**
 	 * The top percentage of the population (in terms of fitness) that will be selected for procreation.
 	 * The value of _selectionPercentage is the percentage divided by 100, resulting in a value between 0 and 1 (inclusive).
 	 * Example: a _selectionPercentage of 0.5 means the fittest 50% of the population will be selected,
@@ -255,13 +304,11 @@ class GeneticAlgorithm
 template<typename T_GENE>
 class Genotype
 {
-	friend class Crossover<Genotype, T_GENE>;
-	
 	public:
 	/**
-	 * Creates a Genotype for the given genes, storing the mutation function provided for its reproduction.
+	 * Creates a Genotype for the given genes.
 	 */
-	Genotype(const std::vector<T_GENE>& genes, T_GENE (*mutationFunction)(T_GENE));
+	Genotype(const std::vector<T_GENE>& genes);
 	
 	/**
 	 * Creates a copy of the given genotype.
@@ -278,44 +325,24 @@ class Genotype
 	virtual unsigned int getGeneCount() const;
 	
 	/**
-	 * Retrieves the gene at the given index.
+	 * Retrieves a copy of the gene at the given index.
 	 * Valid indices are [0;n> where n is the number of genes in this genotype.
 	 */
 	virtual T_GENE getGeneAt(unsigned int index) const;
+	
+	virtual void setGeneAt(unsigned int index, T_GENE geneValue);
 	
 	/**
 	 * Returns a copy of the vector containing all of this Genotype's genes.
 	 */
 	virtual std::vector<T_GENE> getAllGenes() const;
 	
-	/**
-	 * Creates and returns a genotype representing the child of this genotype
-	 * and the given other parent, using material from both parents depending
-	 * on the crossover pattern provided.
-	 *
-	 * Parameters:
-	 * otherParent the genetic information to merge with this genotype in order to produce a child
-	 * crossoverPattern a vector indicating which parent to take each gene from. For any gene index, a value of false means using this genotype's gene, a value of true means using the other parent's gene.
-	 * geneMutationProbabilities indicates the individual mutation rate for each gene. Each value has to be in range [0;1], where 0 means no chance of mutation, and 1 means guaranteed mutation.
-	 *
-	 * TODO: replace with crossover classes
-	 * 
-	 * Exceptions:
-	 * std::invalid_argument if otherParent doesn't have the same number of genes as this genotype.
-	 */
-	virtual Genotype crossoverWith(const Genotype& otherParent, const std::vector<bool>& crossoverPattern, const std::vector<double>& geneMutationProbabilities);
-	
 	protected:
+	
 	/**
 	 * Datastructure to hold the gene data.
 	 */
 	std::vector<T_GENE> _genes;
-	
-	/**
-	 * The gene mutation function provided for this Genotype object.
-	 * Takes a gene as input and returns the mutated version of that gene.
-	 */
-	T_GENE (*_mutationFunction)(T_GENE);
 };
 
 #endif /* GENETIC_ALGORITHM_H */
