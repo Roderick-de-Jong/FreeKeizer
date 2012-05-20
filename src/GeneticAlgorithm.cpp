@@ -107,7 +107,8 @@ void GeneticAlgorithm<T_GENOTYPE, T_GENE>::seed(const std::vector<T_GENOTYPE<T_G
                                                 std::auto_ptr<FitnessFunction<T_GENOTYPE, T_GENE> > fitnessFunction,
                                                 std::auto_ptr<Crossover<T_GENOTYPE, T_GENE> > crossover,
                                                 std::auto_ptr<MutationFunction<T_GENOTYPE, T_GENE> > mutationFunction,
-                                                const double selectionPercentage)
+                                                const double selectionPercentage,
+                                                const unsigned int parentsPerChild)
 {
 	_population = initialPopulation;
 	_oldPopulation.clear();
@@ -119,6 +120,7 @@ void GeneticAlgorithm<T_GENOTYPE, T_GENE>::seed(const std::vector<T_GENOTYPE<T_G
 	_crossover = crossover;
 	_mutationFunction = mutationFunction;
 	_selectionPercentage = selectionPercentage;
+	_parentsPerChild = parentsPerChild;
 }
 
 template<template<class> class T_GENOTYPE, class T_GENE>
@@ -153,20 +155,27 @@ void GeneticAlgorithm<T_GENOTYPE, T_GENE>::createNextGeneration()
 	_populationFitness.clear();
 	
 	// Crossover & mutation
-	while(_population.size() < _oldPopulation.size())
+	if(selectionSize >= _parentsPerChild) // Ensure we have enough parents to produce ANY children.
 	{
-		// Randomly pair up all selected genotypes
-		random_shuffle(selectedGenotypes.begin(), selectedGenotypes.end());
-		for(unsigned int g = 1; g < selectedGenotypes.size(); g += 2)
+		unsigned int nrMatingGroups = selectionSize / _parentsPerChild;
+		while(_population.size() < _oldPopulation.size())
 		{
-			std::vector<T_GENOTYPE<T_GENE> > parents;
-			parents.push_back(selectedGenotypes.at(g));
-			parents.push_back(selectedGenotypes.at(g - 1));
-			T_GENOTYPE<T_GENE> child = _crossover->createChild(parents);
-			_mutationFunction->mutate(child);
-			_population.push_back(child);
-			if(_population.size() >= _oldPopulation.size())
-				break;
+			// Randomly pair up all selected genotypes
+			random_shuffle(selectedGenotypes.begin(), selectedGenotypes.end());
+			// Divide selected genotypes into mating groups
+			for(unsigned int matingGroup = 0; matingGroup < nrMatingGroups; matingGroup++)
+			{
+				// Collect this mating group
+				std::vector<T_GENOTYPE<T_GENE> > parents;
+				for(unsigned int p = 0; p < _parentsPerChild; p++)
+					parents.push_back(selectedGenotypes.at(p + matingGroup * _parentsPerChild));
+				// Have them produce a child
+				T_GENOTYPE<T_GENE> child = _crossover->createChild(parents);
+				_mutationFunction->mutate(child);
+				_population.push_back(child);
+				if(_population.size() >= _oldPopulation.size())
+					break;
+			}
 		}
 	}
 }
@@ -221,6 +230,14 @@ template<typename T_GENE>
 Genotype<T_GENE>::~Genotype()
 {
 	_genes.clear();
+}
+
+template<typename T_GENE>
+Genotype<T_GENE>& Genotype<T_GENE>::operator=(const Genotype<T_GENE>& rhs)
+{
+	if(&rhs != this)
+		_genes = rhs._genes;
+	return *this;
 }
 
 template<typename T_GENE>

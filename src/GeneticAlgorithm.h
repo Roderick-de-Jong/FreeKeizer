@@ -213,7 +213,8 @@ class GeneticAlgorithm
 	                  std::auto_ptr<FitnessFunction<T_GENOTYPE, T_GENE> > fitnessFunction,
 	                  std::auto_ptr<Crossover<T_GENOTYPE, T_GENE> > crossover,
 	                  std::auto_ptr<MutationFunction<T_GENOTYPE, T_GENE> > mutationFunction,
-	                  const double selectionPercentage);
+	                  const double selectionPercentage,
+                      const unsigned int parentsPerChild);
 	
 	/**
 	 * Calculates the fitness value for each of the genotypes in the current population
@@ -293,6 +294,18 @@ class GeneticAlgorithm
 	 * whereas a _selectionPercentage of 0.1 means the fittest 10% will be selected.
 	 */
 	double _selectionPercentage;
+	
+	/**
+	 * The number of parents that combine their genes in order to create a child genotype.
+	 * 
+	 * The minimum value is 1 for asexual reproduction.
+	 * A common value is 2 for basic two-parent sexual reproduction.
+	 * 
+	 * There is no maximum value other than the datatype limit, however if the value used here
+	 * is higher than _selectionPercentage times the population size, there will not be enough
+	 * parents to produce any children and thus the population will instantly die out.
+	 */
+	unsigned int _parentsPerChild;
 };
 
 
@@ -315,6 +328,11 @@ class Genotype
 	 * The copy will have the same genes and the same mutation function.
 	 */
 	Genotype(const Genotype& source);
+	
+	/**
+	 * Assignment operator
+	 */
+	Genotype<T_GENE>& operator=(const Genotype<T_GENE>& rhs);
 	
 	virtual ~Genotype();
 	
@@ -344,6 +362,8 @@ class Genotype
 	 */
 	std::vector<T_GENE> _genes;
 };
+
+// TODO: create ChromosomeGenotype subclass that supports chromosomes.
 
 #endif /* GENETIC_ALGORITHM_H */
 

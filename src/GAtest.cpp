@@ -120,6 +120,7 @@ int main(void)
 	const int populationSize = 20;
 	const double selectionPercentage = 0.30;
 	const int maxGeneration = 10;
+	const unsigned int parentsPerChild = 2;
 	const double mutationRate = 0.05; // 5% chance each gene
 	
 	cout << "GAtest" << endl;
@@ -143,7 +144,7 @@ int main(void)
 		Genotype<char> individual = Genotype<char>(genes);
 		initialPopulation.push_back(individual);
 	}
-	ga.seed(initialPopulation, fitnessFunction, crossover, mutationFunction, selectionPercentage);
+	ga.seed(initialPopulation, fitnessFunction, crossover, mutationFunction, selectionPercentage, parentsPerChild);
 
 	cout << "Starting genetic algorithm..." << endl;;
 	int generation;
