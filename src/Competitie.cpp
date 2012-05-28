@@ -27,6 +27,7 @@
 #include "CompetitieParameters.h"
 #include "Ranglijst.h"
 #include "SchaakConstantes.h"
+#include "IndelerGeneticAlgorithm.h"
 
 //#define DEBUG_DUMP_COMPETITIEPARAMETERS
 //#define DEBUG_DUMP_SPELERSLIJST
@@ -123,6 +124,46 @@ void Competitie::leesCompetitieDatabase()
 
 
 
+void Competitie::nieuweRonde()
+{
+	if(_logStream != NULL)
+	{
+		(*_logStream) << "Niewe ronde toevoegen...";
+		_logStream->flush();
+	}
+	
+	_rondes.push_back(new Ronde());
+	
+	if(_logStream != NULL)
+		(*_logStream) << "OK" << std::endl;
+}
+
+
+
+void Competitie::maakIndeling()
+{
+	if(_logStream != NULL)
+		(*_logStream) << "Bezig met maken van indeling..." << std::endl;
+	
+	std::auto_ptr<IndelerGeneticAlgorithm> indeler(new IndelerGeneticAlgorithm(this));
+	
+	// Neem de partiële indeling:
+	Ronde* vastgelegdePartijen = _rondes.back();
+	// Verkrijg een volledige indeling
+	Ronde* ronde = indeler->maakIndeling();
+	
+	// Vervang de oude indeling door de nieuwe
+	_rondes.pop_back();
+	delete vastgelegdePartijen;
+	vastgelegdePartijen = NULL;
+	_rondes.push_back(ronde);
+	
+	if(_logStream != NULL)
+		(*_logStream) << "Klaar met maken van indeling." << std::endl;
+}
+
+
+
 std::auto_ptr<CompetitieParameters> Competitie::getCompetitieParameters()
 {
 	return std::auto_ptr<CompetitieParameters>(new CompetitieParameters(*_competitieParameters));
@@ -161,10 +202,10 @@ std::auto_ptr<Ranglijst> Competitie::getRanglijstNaRonde(unsigned int ronde)
 
 
 
-std::auto_ptr<Ronde> Competitie::getUitslagVanRonde(unsigned int ronde)
+std::auto_ptr<Ronde> Competitie::getRonde(unsigned int ronde)
 {
-	if(ronde > _nrRondes)
-		throw std::invalid_argument("Kan geen uitslagen uit de toekomst geven.");
+	if(ronde > _rondes.size())
+		throw std::invalid_argument("Kan geen rondes uit de toekomst geven.");
 	
 	return std::auto_ptr<Ronde>(new Ronde(*_rondes.at(ronde)));
 }
@@ -202,6 +243,7 @@ void Competitie::_berekenStand()
 	_ranglijstNaRonde.resize(_nrRondes + 1); // Startranglijst + nieuwe ranglijst na elke ronde
 	
 	// Nieuwe ranglijsten berekenen
+	// TODO: eerst nagaan of de laatste ronde wel helemaal klaar is (middels .isVoltooid())!
 	for(unsigned int r = 1; r <= _nrRondes; r++)
 		_berekenStandNaRonde(r);
 }

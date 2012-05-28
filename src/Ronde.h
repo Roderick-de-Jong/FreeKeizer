@@ -37,6 +37,14 @@ class Ronde
 	public:
 	Ronde();
 	virtual ~Ronde();
+	
+	/**
+	 * Geeft aan of alle partijen van deze ronde gespeeld zijn.
+	 * @return false als er nog minstens 1 partij is met waarde NOG_TE_SPELEN
+	 *         true als er 0 partijen zijn met waarde NOG_TE_SPELEN
+	 */
+	virtual bool isVoltooid();
+	
 	virtual void dump(Spelerslijst* spelerslijst, std::ostream* outputStream);
 
 	std::string datum;

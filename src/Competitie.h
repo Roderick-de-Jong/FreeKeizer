@@ -73,6 +73,21 @@ class Competitie
 	 */
 	virtual void leesCompetitieDatabase();
 	
+	/**
+	 * Voegt een lege Ronde aan de competitie toe.
+	 * Deze ronde kan vervolgens handmatig of automatisch worden ingedeeld,
+	 * of met een combinatie van beide.
+	 * TODO: zorgen dat dit alleen aangeroepen kan worden als de vorige ronde voltooid is
+	 */
+	virtual void nieuweRonde();
+	
+	/**
+	 * Neemt de meest recente ronde en alle spelers die nog niet ingedeeld zijn
+	 * in die ronde, en probeert de ronde aan te vullen met partijen tussen die
+	 * spelers.
+	 */
+	virtual void maakIndeling();
+	
 	// TODO: mutators voor simpele operaties, zodat een GUI gebouwd kan worden voor FreeKeizer
 	// TODO: batch mode, zodat niet na elke simpele operatie de stand herberekend wordt
 	
@@ -103,11 +118,11 @@ class Competitie
 	virtual std::auto_ptr<Ranglijst> getRanglijstNaRonde(unsigned int ronde);
 	
 	/**
-	 * Retourneert een kopie van de partij-uitslagen van de gevraagde ronde.
+	 * Retourneert een kopie van de partijen (incl. uitslagen) van de gevraagde ronde.
 	 * @param ronde Geeft aan voor welke ronde de uitslag gevraagd wordt; bereik is [0;n] waarbij n het aantal gespeelde rondes is in deze competitie.
 	 * TODO: opvragen van uitslag ronde 0 illegaal maken? Da's een NULL pointer namelijk.
 	 */
-	virtual std::auto_ptr<Ronde> getUitslagVanRonde(unsigned int ronde);
+	virtual std::auto_ptr<Ronde> getRonde(unsigned int ronde);
 
 	
 	
@@ -196,6 +211,7 @@ class Competitie
 
 	/**
 	 * Geeft aan hoeveel rondes er gespeeld zijn.
+	 * TODO: weg-refactoren, en _rondes.size() gebruiken!!
 	 */	
 	unsigned int _nrRondes;
 	

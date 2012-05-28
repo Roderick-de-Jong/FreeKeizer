@@ -170,7 +170,7 @@ void KeizerIO::writeRanglijstDocument(Competitie* competitie, unsigned int ronde
 	
 	if(ronde > 0)
 	{
-		uitslagAfgelopenRonde = competitie->getUitslagVanRonde(ronde);
+		uitslagAfgelopenRonde = competitie->getRonde(ronde);
 		datumAfgelopenRonde = uitslagAfgelopenRonde->datum;
 	}
 	else
@@ -288,7 +288,7 @@ void KeizerIO::writeKruistabel(Competitie* competitie, unsigned int ronde)
 	// Kruistabel vullen
 	for(unsigned int r = 0; r < ronde; r++)
 	{
-		std::auto_ptr<Ronde> uitslagDezeRonde = competitie->getUitslagVanRonde(r);
+		std::auto_ptr<Ronde> uitslagDezeRonde = competitie->getRonde(r);
 		for(unsigned int p = 0; p < uitslagDezeRonde->partijen.size(); p++)
 		{
 			Partij* partij = uitslagDezeRonde->partijen[p];
@@ -339,7 +339,7 @@ void KeizerIO::writeKruistabel(Competitie* competitie, unsigned int ronde)
 	         << "</head>\n"
 	         << "<body>\n<h1>" << competitieTitel << "</h1>\n"
 	         << "<h2>Kruistabel na ronde " << ronde << ", gespeeld op "
-	         << competitie->getUitslagVanRonde(ronde)->datum << "</h2>\n"
+	         << competitie->getRonde(ronde)->datum << "</h2>\n"
 	         << "<table>\n"
 	         << "<tr>\n"
 	         << "  <th rowspan=\"2\" style=\"vertical-align:bottom\">Naam speler</td>\n"

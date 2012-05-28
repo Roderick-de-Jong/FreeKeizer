@@ -22,14 +22,17 @@
 
 /**
  * Constantes ter representatie van uitslagen van partijen
+ * TODO: ondersteuning voor waarden NOG_TE_SPELEN en hoger inbouwen in uitslagverwerking
  */
 enum PartijResultaat
 {
 	ZWART_WINT = 0,
 	WIT_WINT = 1,
 	REMISE = 2,
-	VRIJE_RONDE = 3,
-	NOG_TE_SPELEN = 4
+	VRIJE_RONDE = 3, // Geeft aan dat de witspeler een vrij ronde heeft.
+	NOG_TE_SPELEN = 4, // Geeft aan dat deze partij nog niet gespeeld is.
+	AFWEZIG_MET_GELDIGE_REDEN = 5, // Geeft aan dat de witspeler geoorloofd afwezig is.
+	AFWEZIG_ZONDER_GELDIGE_REDEN = 6 // Geeft aan dat de witspeler ongeoorloofd afwezig is.
 };
 
 /**

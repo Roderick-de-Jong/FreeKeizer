@@ -34,6 +34,14 @@ Ronde::~Ronde()
   partijen.clear();
 }
 
+bool Ronde::isVoltooid()
+{
+	for(std::vector<Partij*>::iterator i = partijen.begin(); i != partijen.end(); i++)
+		if((*i)->resultaat == NOG_TE_SPELEN)
+			return false;
+	return true;
+}
+
 void Ronde::dump(Spelerslijst* spelerslijst, std::ostream* outputStream)
 {
   Partij* partij = NULL;

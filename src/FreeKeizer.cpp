@@ -62,6 +62,19 @@ int main(/* int argc, char** argv */)
 		
 		competitie.writeRanglijstDocument(aantalRondes);
 		
+		competitie.nieuweRonde();
+		aantalRondes++;
+		competitie.maakIndeling();
+		
+		// Toon de nieuwe indeling
+		cout << "--- Indeling ronde " << aantalRondes << " ---" << endl;
+		auto_ptr<Ronde> indeling = competitie.getRonde(aantalRondes); // vraag de nieuwe ronde op
+		auto_ptr<Spelerslijst> spelerslijst = competitie.getSpelerslijst();
+		Spelerslijst* pSpelerslijst = spelerslijst.release();
+		indeling->dump(pSpelerslijst, &cout);
+		delete pSpelerslijst; pSpelerslijst = NULL;
+		cout << "-------------------------" << endl;
+		
 		// Roadmap:
 		// - Unittests voor class Ronde
 		// - class IndelingMaker met GeneticAlgorithm
