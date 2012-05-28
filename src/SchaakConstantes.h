@@ -28,7 +28,8 @@ enum PartijResultaat
 	ZWART_WINT = 0,
 	WIT_WINT = 1,
 	REMISE = 2,
-	VRIJE_RONDE = 3
+	VRIJE_RONDE = 3,
+	NOG_TE_SPELEN = 4
 };
 
 /**

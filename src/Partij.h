@@ -23,7 +23,8 @@
 #include "SchaakConstantes.h"
 
 /**
- * Representatie van de uitslag van één individuele schaakpartij.
+ * Representatie van (de uitslag van) één individuele schaakpartij.
+ * Wordt zowel gebruikt bij het indelen van partijen als het verwerken van uitslagen.
  */
 class Partij
 {

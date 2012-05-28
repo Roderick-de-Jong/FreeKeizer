@@ -11,7 +11,7 @@ OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%.o,$(CPP_FILES))
 
 COMPETITIE_DATASTRUCTURES_MODULES = $(BIN_DIR)/Competitie.o $(BIN_DIR)/CompetitieParameters.o $(BIN_DIR)/Partij.o $(BIN_DIR)/Ranglijst.o \
                                     $(BIN_DIR)/RanglijstItem.o $(BIN_DIR)/Ronde.o $(BIN_DIR)/Speler.o $(BIN_DIR)/Spelerslijst.o
-MISC_MODULES = $(BIN_DIR)/KeizerIO.o
+MISC_MODULES = $(BIN_DIR)/KeizerIO.o $(BIN_DIR)/Indeler.o
 
 all: $(BIN_DIR)/FreeKeizer $(BIN_DIR)/Unittest $(BIN_DIR)/GAtest
 
