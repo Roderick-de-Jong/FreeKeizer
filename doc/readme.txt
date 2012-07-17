@@ -25,3 +25,6 @@ voor A (het uitslagtype) zijn:
 1 wit wint
 2 remise
 3 vrije ronde (C kan worden weggelaten)
+
+
+Working copie
