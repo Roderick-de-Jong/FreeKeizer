@@ -22,10 +22,10 @@
 #include <assert.h>
 
 #include "Unittest.h"
-#include "Partij.h"
-#include "Ranglijst.h"
-#include "Ronde.h"
-#include "Spelerslijst.h"
+#include "Game.h"
+#include "Ranking.h"
+#include "Round.h"
+#include "PlayerList.h"
 
 
 using namespace std;

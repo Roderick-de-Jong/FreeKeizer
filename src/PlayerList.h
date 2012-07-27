@@ -1,5 +1,5 @@
-#ifndef PARTIJ_H
-#define PARTIJ_H
+#ifndef SPELERSLIJST_H
+#define SPELERSLIJST_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -20,33 +20,65 @@
  *                                                                       *
  *************************************************************************/
 
-#include "SchaakConstantes.h"
+#include <iostream>
+#include <vector>
 
-/**
- * Representatie van (de uitslag van) één individuele schaakpartij.
- * Wordt zowel gebruikt bij het indelen van partijen als het verwerken van uitslagen.
- */
-class Partij
+#include "Player.h"
+#include "Unittest.h"
+
+
+
+// TODO: IMPORTANT: add a (dummy) player 0 to the player database, now that player IDs start at 0!!!!!
+
+class Spelerslijst
 {
+	friend class FreeKeizerUnittest;
+	
 	public:
-	Partij();
-	virtual ~Partij();
 	
 	/**
-	* Het unieke ID van de witspeler.
-	*/
-	int idWit;
+	 * Default constructor.
+	 */
+	Spelerslijst();
 	
 	/**
-	* Het unieke ID van de zwartspeler, of -1 bij geen zwartspeler, bijv. bij een vrije ronde.
-	*/
-	int idZwart;
+	 * Copy constructor.
+	 */
+	Spelerslijst(Spelerslijst& original);
 	
 	/**
-	* Code die aangeeft wat de uitslag van de partij was.
-	*/
-	enum PartijResultaat resultaat;
+	 * Destructor.
+	 */
+	virtual ~Spelerslijst();
+	
+	/**
+	 * Assignment operator.
+	 */
+	Spelerslijst& operator=(const Spelerslijst& original);
+	
+	virtual Speler* getSpelerById(unsigned int spelerId);
+	
+	/**
+	 * Returns:
+	 * De speler met de naam in kwestie, of NULL indien niet gevonden.
+	 */
+	virtual Speler* getSpelerByNaam(const std::string& spelerNaam);
+
+	virtual unsigned int getNrSpelers();
+	
+	virtual void voegSpelerToe(Speler* speler);
+	
+	/**
+	 * Geeft de spelerslijst weer op de gegeven outputstream.
+	 */
+	virtual void dump(std::ostream* outputStream);
+	
+	protected:
+	
+	virtual void _verwijderAlleSpelers();
+	
+	std::vector<Speler*> _spelers;
 };
 
-#endif // PARTIJ_H
+#endif // SPELERSLIJST_H
 

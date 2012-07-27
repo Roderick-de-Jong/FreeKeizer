@@ -26,10 +26,10 @@
 #include <iostream>
 
 #include "CompetitieParameters.h"
-#include "KeizerIO.h"
-#include "Ranglijst.h"
-#include "Ronde.h"
-#include "Spelerslijst.h"
+#include "IOServices.h"
+#include "Ranking.h"
+#include "Round.h"
+#include "PlayerList.h"
 
 // Forward declarations
 class KeizerIO;

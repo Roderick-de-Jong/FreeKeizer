@@ -20,7 +20,7 @@
  *                                                                       *
  *************************************************************************/
 
-#include "Spelerslijst.h"
+#include "PlayerList.h"
 
 /**
  * Datastructuur voor één regel met spelersstatistieken op een ranglijst.

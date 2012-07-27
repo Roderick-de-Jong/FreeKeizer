@@ -1,3 +1,6 @@
+#ifndef PARTIJ_H
+#define PARTIJ_H
+
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
  *                                                                       *
@@ -17,12 +20,33 @@
  *                                                                       *
  *************************************************************************/
 
-#include "Indeler.h"
+#include "ChessConstants.h"
 
-Indeler::Indeler(Competitie* competitie)
+/**
+ * Representatie van (de uitslag van) één individuele schaakpartij.
+ * Wordt zowel gebruikt bij het indelen van partijen als het verwerken van uitslagen.
+ */
+class Partij
 {
-	if(competitie == NULL)
-		throw std::invalid_argument("Indeler: competitie is NULL.");
+	public:
+	Partij();
+	virtual ~Partij();
 	
-	_competitie = competitie;
-}
+	/**
+	* Het unieke ID van de witspeler.
+	*/
+	int idWit;
+	
+	/**
+	* Het unieke ID van de zwartspeler, of -1 bij geen zwartspeler, bijv. bij een vrije ronde.
+	*/
+	int idZwart;
+	
+	/**
+	* Code die aangeeft wat de uitslag van de partij was.
+	*/
+	enum PartijResultaat resultaat;
+};
+
+#endif // PARTIJ_H
+

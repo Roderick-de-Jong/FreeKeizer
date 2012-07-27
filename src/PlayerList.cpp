@@ -19,7 +19,7 @@
 
 #include <stdexcept>
 
-#include "Spelerslijst.h"
+#include "PlayerList.h"
 
 Spelerslijst::Spelerslijst()
 {

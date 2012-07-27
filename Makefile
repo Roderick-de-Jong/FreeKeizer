@@ -9,9 +9,9 @@ BIN_DIR = bin
 CPP_FILES = $(wildcard $(SRC_DIR)/*.cpp)
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%.o,$(CPP_FILES))
 
-COMPETITIE_DATASTRUCTURES_MODULES = $(BIN_DIR)/Competitie.o $(BIN_DIR)/CompetitieParameters.o $(BIN_DIR)/Partij.o $(BIN_DIR)/Ranglijst.o \
-                                    $(BIN_DIR)/RanglijstItem.o $(BIN_DIR)/Ronde.o $(BIN_DIR)/Speler.o $(BIN_DIR)/Spelerslijst.o
-MISC_MODULES = $(BIN_DIR)/KeizerIO.o $(BIN_DIR)/Indeler.o $(BIN_DIR)/IndelerGeneticAlgorithm.o
+COMPETITIE_DATASTRUCTURES_MODULES = $(BIN_DIR)/Competition.o $(BIN_DIR)/CompetitieParameters.o $(BIN_DIR)/Game.o $(BIN_DIR)/Ranking.o \
+                                    $(BIN_DIR)/RankingItem.o $(BIN_DIR)/Round.o $(BIN_DIR)/Player.o $(BIN_DIR)/PlayerList.o
+MISC_MODULES = $(BIN_DIR)/IOServices.o $(BIN_DIR)/PairingGenerator.o $(BIN_DIR)/GAPairingGenerator.o
 
 all: $(BIN_DIR)/FreeKeizer $(BIN_DIR)/Unittest $(BIN_DIR)/GAtest
 

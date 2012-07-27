@@ -9,9 +9,9 @@
 #include <string>
 #include <stdexcept>
 
-#include "KeizerIO.h"
+#include "IOServices.h"
 #include "CompetitieParameters.h"
-#include "Partij.h"
+#include "Game.h"
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
  *                                                                       *
@@ -31,8 +31,8 @@
  *                                                                       *
  *************************************************************************/
 
-#include "Ronde.h"
-#include "Spelerslijst.h"
+#include "Round.h"
+#include "PlayerList.h"
 
 KeizerIO::KeizerIO()
 {

@@ -1,6 +1,3 @@
-#ifndef INDELER_H
-#define INDELER_H
-
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
  *                                                                       *
@@ -20,23 +17,13 @@
  *                                                                       *
  *************************************************************************/
 
-#include "Competitie.h"
+#include "Player.h"
 
-
-/**
- * Produceert mogelijke indelingen voor de volgende ronde van een competitie.
- * Dit is een abstract class.
- */
-class Indeler
+Speler::Speler()
 {
-	public:
-	Indeler(Competitie* competitie);
-	virtual ~Indeler() { }
-	
-	virtual Ronde* maakIndeling() = 0;
-	
-	protected:
-	Competitie* _competitie;
-};
+}
 
-#endif /* INDELER_H */
+Speler::~Speler()
+{
+}
+

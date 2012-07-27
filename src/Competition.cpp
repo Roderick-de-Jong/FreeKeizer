@@ -23,11 +23,11 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "Competitie.h"
+#include "Competition.h"
 #include "CompetitieParameters.h"
-#include "Ranglijst.h"
-#include "SchaakConstantes.h"
-#include "IndelerGeneticAlgorithm.h"
+#include "Ranking.h"
+#include "ChessConstants.h"
+#include "GAPairingGenerator.h"
 
 //#define DEBUG_DUMP_COMPETITIEPARAMETERS
 //#define DEBUG_DUMP_SPELERSLIJST

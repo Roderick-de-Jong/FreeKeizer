@@ -17,8 +17,8 @@
  *                                                                       *
  *************************************************************************/
 
-#include "Ronde.h"
-#include "Spelerslijst.h"
+#include "Round.h"
+#include "PlayerList.h"
 
 Ronde::Ronde()
 {

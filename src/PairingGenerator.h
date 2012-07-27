@@ -1,5 +1,5 @@
-#ifndef INDELERGENETICALGORITHM_H
-#define INDELERGENETICALGORITHM_H
+#ifndef INDELER_H
+#define INDELER_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -20,16 +20,23 @@
  *                                                                       *
  *************************************************************************/
 
-#include "Indeler.h"
-#include "GeneticAlgorithm.h"
+#include "Competition.h"
 
-class IndelerGeneticAlgorithm : public Indeler
+
+/**
+ * Produceert mogelijke indelingen voor de volgende ronde van een competitie.
+ * Dit is een abstract class.
+ */
+class Indeler
 {
 	public:
-	IndelerGeneticAlgorithm(Competitie* competitie);
-	virtual ~IndelerGeneticAlgorithm();
+	Indeler(Competitie* competitie);
+	virtual ~Indeler() { }
 	
-	virtual Ronde* maakIndeling();
+	virtual Ronde* maakIndeling() = 0;
+	
+	protected:
+	Competitie* _competitie;
 };
 
-#endif /* INDELERGENETICALGORITHM_H */
+#endif /* INDELER_H */

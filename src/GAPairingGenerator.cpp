@@ -1,6 +1,3 @@
-#ifndef RONDE_H
-#define RONDE_H
-
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
  *                                                                       *
@@ -20,36 +17,25 @@
  *                                                                       *
  *************************************************************************/
 
-#include <iostream>
-#include <string>
-#include <vector>
+#include "GAPairingGenerator.h"
 
-#include "Partij.h"
-#include "Spelerslijst.h"
-
-/**
- * Representeert de nog te spelen of reeds gespeelde partijen in een ronde van de competitie.
- * Kan worden gebruikt voor zowel het registreren en opslaan van uitslagen als het maken
- * van een indeling voor een ronde.
- */
-class Ronde
+IndelerGeneticAlgorithm::IndelerGeneticAlgorithm(Competitie* competitie)
+	: Indeler(competitie)
 {
-	public:
-	Ronde();
-	virtual ~Ronde();
+}
+
+IndelerGeneticAlgorithm::~IndelerGeneticAlgorithm()
+{
+}
+
+Ronde* IndelerGeneticAlgorithm::maakIndeling()
+{
+	std::auto_ptr<Spelerslijst> spelerslijst(_competitie->getSpelerslijst());
 	
-	/**
-	 * Geeft aan of alle partijen van deze ronde gespeeld zijn.
-	 * @return false als er nog minstens 1 partij is met waarde NOG_TE_SPELEN
-	 *         true als er 0 partijen zijn met waarde NOG_TE_SPELEN
-	 */
-	virtual bool isVoltooid();
+	// TODO: run genetic algorithm
 	
-	virtual void dump(Spelerslijst* spelerslijst, std::ostream* outputStream);
-
-	std::string datum;
-	std::vector<Partij*> partijen;
-};
-
-#endif // RONDE_H
-
+	Ronde* ronde = new Ronde();
+	// TODO: store GA's result in Ronde object
+	
+	return ronde;
+}

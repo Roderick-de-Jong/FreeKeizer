@@ -22,7 +22,7 @@
 
 #include <vector>
 
-#include "RanglijstItem.h"
+#include "RankingItem.h"
 #include "Unittest.h"
 
 /**

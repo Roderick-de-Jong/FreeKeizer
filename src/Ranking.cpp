@@ -21,8 +21,8 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "Ranglijst.h"
-#include "RanglijstItem.h"
+#include "Ranking.h"
+#include "RankingItem.h"
 
 Ranglijst::Ranglijst()
 {

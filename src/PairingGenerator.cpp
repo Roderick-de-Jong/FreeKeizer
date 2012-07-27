@@ -17,13 +17,12 @@
  *                                                                       *
  *************************************************************************/
 
-#include "Speler.h"
+#include "PairingGenerator.h"
 
-Speler::Speler()
+Indeler::Indeler(Competitie* competitie)
 {
+	if(competitie == NULL)
+		throw std::invalid_argument("Indeler: competitie is NULL.");
+	
+	_competitie = competitie;
 }
-
-Speler::~Speler()
-{
-}
-

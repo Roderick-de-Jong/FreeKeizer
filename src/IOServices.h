@@ -22,12 +22,12 @@
 
 #include <memory>
 
-#include "Competitie.h"
+#include "Competition.h"
 #include "CompetitieParameters.h"
-#include "Ranglijst.h"
-#include "Ronde.h"
-#include "Speler.h"
-#include "Spelerslijst.h"
+#include "Ranking.h"
+#include "Round.h"
+#include "Player.h"
+#include "PlayerList.h"
 
 // Forward declarations
 class Competitie;

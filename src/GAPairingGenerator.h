@@ -1,3 +1,6 @@
+#ifndef INDELERGENETICALGORITHM_H
+#define INDELERGENETICALGORITHM_H
+
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
  *                                                                       *
@@ -17,25 +20,16 @@
  *                                                                       *
  *************************************************************************/
 
-#include "IndelerGeneticAlgorithm.h"
+#include "PairingGenerator.h"
+#include "GeneticAlgorithm.h"
 
-IndelerGeneticAlgorithm::IndelerGeneticAlgorithm(Competitie* competitie)
-	: Indeler(competitie)
+class IndelerGeneticAlgorithm : public Indeler
 {
-}
+	public:
+	IndelerGeneticAlgorithm(Competitie* competitie);
+	virtual ~IndelerGeneticAlgorithm();
+	
+	virtual Ronde* maakIndeling();
+};
 
-IndelerGeneticAlgorithm::~IndelerGeneticAlgorithm()
-{
-}
-
-Ronde* IndelerGeneticAlgorithm::maakIndeling()
-{
-	std::auto_ptr<Spelerslijst> spelerslijst(_competitie->getSpelerslijst());
-	
-	// TODO: run genetic algorithm
-	
-	Ronde* ronde = new Ronde();
-	// TODO: store GA's result in Ronde object
-	
-	return ronde;
-}
+#endif /* INDELERGENETICALGORITHM_H */

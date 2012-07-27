@@ -1,5 +1,5 @@
-#ifndef SPELERSLIJST_H
-#define SPELERSLIJST_H
+#ifndef RONDE_H
+#define RONDE_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -21,64 +21,35 @@
  *************************************************************************/
 
 #include <iostream>
+#include <string>
 #include <vector>
 
-#include "Speler.h"
-#include "Unittest.h"
+#include "Game.h"
+#include "PlayerList.h"
 
-
-
-// TODO: IMPORTANT: add a (dummy) player 0 to the player database, now that player IDs start at 0!!!!!
-
-class Spelerslijst
+/**
+ * Representeert de nog te spelen of reeds gespeelde partijen in een ronde van de competitie.
+ * Kan worden gebruikt voor zowel het registreren en opslaan van uitslagen als het maken
+ * van een indeling voor een ronde.
+ */
+class Ronde
 {
-	friend class FreeKeizerUnittest;
-	
 	public:
+	Ronde();
+	virtual ~Ronde();
 	
 	/**
-	 * Default constructor.
+	 * Geeft aan of alle partijen van deze ronde gespeeld zijn.
+	 * @return false als er nog minstens 1 partij is met waarde NOG_TE_SPELEN
+	 *         true als er 0 partijen zijn met waarde NOG_TE_SPELEN
 	 */
-	Spelerslijst();
+	virtual bool isVoltooid();
 	
-	/**
-	 * Copy constructor.
-	 */
-	Spelerslijst(Spelerslijst& original);
-	
-	/**
-	 * Destructor.
-	 */
-	virtual ~Spelerslijst();
-	
-	/**
-	 * Assignment operator.
-	 */
-	Spelerslijst& operator=(const Spelerslijst& original);
-	
-	virtual Speler* getSpelerById(unsigned int spelerId);
-	
-	/**
-	 * Returns:
-	 * De speler met de naam in kwestie, of NULL indien niet gevonden.
-	 */
-	virtual Speler* getSpelerByNaam(const std::string& spelerNaam);
+	virtual void dump(Spelerslijst* spelerslijst, std::ostream* outputStream);
 
-	virtual unsigned int getNrSpelers();
-	
-	virtual void voegSpelerToe(Speler* speler);
-	
-	/**
-	 * Geeft de spelerslijst weer op de gegeven outputstream.
-	 */
-	virtual void dump(std::ostream* outputStream);
-	
-	protected:
-	
-	virtual void _verwijderAlleSpelers();
-	
-	std::vector<Speler*> _spelers;
+	std::string datum;
+	std::vector<Partij*> partijen;
 };
 
-#endif // SPELERSLIJST_H
+#endif // RONDE_H
 

@@ -28,12 +28,12 @@
 #include <assert.h>
 #include <math.h>
 
-#include "Competitie.h"
+#include "Competition.h"
 #include "CompetitieParameters.h"
-#include "Partij.h"
-#include "Ranglijst.h"
-#include "Speler.h"
-#include "Spelerslijst.h"
+#include "Game.h"
+#include "Ranking.h"
+#include "Player.h"
+#include "PlayerList.h"
 
 using namespace std;
 
