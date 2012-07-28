@@ -24,34 +24,34 @@
 #include "Ranking.h"
 #include "RankingItem.h"
 
-Ranglijst::Ranglijst()
+Ranking::Ranking()
 {
 }
 
-Ranglijst::~Ranglijst()
+Ranking::~Ranking()
 {
-	_verwijderAlleItems();
+	_deleteAllItems();
 }
 
 
 
-Ranglijst::Ranglijst(Ranglijst& original)
+Ranking::Ranking(Ranking& original)
 {
 	_items.resize(original._items.size());
 	for(unsigned int i = 0; i < original._items.size(); i++)
-		_items[i] = new RanglijstItem(*original._items[i]);
+		_items[i] = new RankingItem(*original._items[i]);
 }
 
 
 
-Ranglijst& Ranglijst::operator=(const Ranglijst& original)
+Ranking& Ranking::operator=(const Ranking& original)
 {
 	if(this != &original)
 	{
-		_verwijderAlleItems();
+		_deleteAllItems();
 		_items.resize(original._items.size());
 		for(unsigned int i = 0; i < original._items.size(); i++)
-			_items[i] = new RanglijstItem(*original._items[i]);
+			_items[i] = new RankingItem(*original._items[i]);
 	}
 	
 	return *this;
@@ -59,102 +59,102 @@ Ranglijst& Ranglijst::operator=(const Ranglijst& original)
 
 
 
-unsigned int Ranglijst::getLengte()
+unsigned int Ranking::getLength()
 {
 	return _items.size();
 }
 
 
 
-RanglijstItem* Ranglijst::getItemOpPlaats(unsigned int plaats)
+RankingItem* Ranking::getItemAtPlace(unsigned int place)
 {
-	if(plaats == 0)
+	if(place == 0)
 		throw std::invalid_argument("Argument 'plaats' is 0, maar de ranglijst begint bij plaats 1.");
-	if(plaats > _items.size())
+	if(place > _items.size())
 		throw std::invalid_argument("Argument 'plaats' is groter dan het aantal spelers op de ranglijst.");
 
-	return _items.at(plaats - 1); // -1 omdat de eerste plek op de ranglijst in element 0 wordt opgeslagen
+	return _items.at(place - 1); // -1 omdat de eerste plek op de ranglijst in element 0 wordt opgeslagen
 }
 
 
 
-RanglijstItem* Ranglijst::getRanglijstItemBySpelerId(unsigned int spelerId)
+RankingItem* Ranking::getRankingItemByPlayerId(unsigned int playerId)
 {
-  RanglijstItem* ranglijstItem = NULL;
+  RankingItem* rankingItem = NULL;
   for(unsigned int r = 0; r < _items.size(); r++)
   {
-    ranglijstItem = _items.at(r);
-    if(ranglijstItem->spelerId == spelerId)
-      return ranglijstItem;
+    rankingItem = _items.at(r);
+    if(rankingItem->playerId == playerId)
+      return rankingItem;
   }
 
 	std::ostringstream message;
-	message << "Speler ID " << spelerId << " niet gevonden in ranglijst.";
+	message << "Speler ID " << playerId << " niet gevonden in ranglijst.";
 	throw std::invalid_argument(message.str());
 }
 
 
 
-void Ranglijst::voegItemToe(RanglijstItem* item)
+void Ranking::addItem(RankingItem* item)
 {
 	_items.push_back(item);
 }
 
 
 
-void Ranglijst::sorteer()
+void Ranking::sort()
 {
-	// Zoek hoogste eigenwaarde
-	int hoogsteEigenwaarde = -1;
+	// Look up highest eigenvalue
+	int highestEigenvalue = -1;
 	for(unsigned int p = 0; p < _items.size(); p++)
-		if(_items[p]->eigenwaarde > hoogsteEigenwaarde)
-			hoogsteEigenwaarde = _items[p]->eigenwaarde;
+		if(_items[p]->eigenvalue > highestEigenvalue)
+			highestEigenvalue = _items[p]->eigenvalue;
 
-	// Sorteer lijst op keizerpunten
-	sort(_items.begin(), _items.end(), compareRanglijstItems);
+	// Sort the list on keizerpoints
+	std::sort(_items.begin(), _items.end(), compareRankingItems);
 	
-	// Pas eigenwaardes aan
+	// Update eigenvalues
 	for(unsigned int s = 0; s < _items.size(); s++)
 	{
-		_items.at(s)->eigenwaarde = hoogsteEigenwaarde - s;
+		_items.at(s)->eigenvalue = highestEigenvalue - s;
 	}
 }
 
 
 
-bool Ranglijst::compareRanglijstItems(RanglijstItem* a, RanglijstItem* b)
+bool Ranking::compareRankingItems(RankingItem* a, RankingItem* b)
 {
-	return a->punten > b->punten;
+	return a->points > b->points;
 }
 
 
 
-void Ranglijst::dump(Spelerslijst* spelersLijst, std::ostream* outputStream)
+void Ranking::dump(PlayerList* playerList, std::ostream* outputStream)
 {
-	RanglijstItem* ranglijstItem = NULL;
-	Speler* speler = NULL;
+	RankingItem* rankingItem = NULL;
+	Player* player = NULL;
 
 	if(outputStream != NULL)
-		(*outputStream) << "Ranglijst:" << std::endl;
+		(*outputStream) << "Ranking:" << std::endl;
 
 	for(unsigned int r = 0; r < _items.size(); r++)
 	{
-		ranglijstItem = _items.at(r);
-		speler = spelersLijst->getSpelerById(ranglijstItem->spelerId);
+		rankingItem = _items.at(r);
+		player = playerList->getPlayerById(rankingItem->playerId);
 		if(outputStream != NULL)
 		{
-			(*outputStream) << r + 1 << ". " << speler->naam << " " << ranglijstItem->punten << " "
-			                << ranglijstItem->eigenwaarde << "   gsp:" << ranglijstItem->nrPartijenGespeeld << " gw:" << ranglijstItem->nrPartijenGewonnen
-			                << " rem:" << ranglijstItem->nrPartijenRemise << " vrl:" << ranglijstItem->nrPartijenVerloren
-			                << " vrij:" << ranglijstItem->nrVrijeRondes << " wpt:" << ranglijstItem->wedstrijdPunten
-			                << "    (id: " << ranglijstItem->spelerId << ")" << std::endl;
+			(*outputStream) << r + 1 << ". " << player->name << " " << rankingItem->points << " "
+			                << rankingItem->eigenvalue << "   gsp:" << rankingItem->nrGamesPlayed << " gw:" << rankingItem->nrGamesWon
+			                << " rem:" << rankingItem->nrGamesDrawn << " vrl:" << rankingItem->nrGamesLost
+			                << " vrij:" << rankingItem->nrRoundsFree << " wpt:" << rankingItem->score
+			                << "    (id: " << rankingItem->playerId << ")" << std::endl;
 		}
 	}
 }
 
 
 
-void Ranglijst::_verwijderAlleItems()
+void Ranking::_deleteAllItems()
 {
 	for(unsigned int i = 0; i < _items.size(); i++)
 	{
@@ -169,20 +169,20 @@ void Ranglijst::_verwijderAlleItems()
 
 
 
-Ranglijst* Ranglijst::maakStartRanglijst(int hoogsteEigenwaarde, Spelerslijst* spelerslijst)
+Ranking* Ranking::createInitialRanking(int highestEigenvalue, PlayerList* playerList)
 {
-  Ranglijst* startRanglijst = new Ranglijst();
-  RanglijstItem* ranglijstItem = NULL;
+  Ranking* initialRanking = new Ranking();
+  RankingItem* rankingItem = NULL;
   
-  for(unsigned int s = 0; s < spelerslijst->getNrSpelers(); s++)
+  for(unsigned int p = 0; p < playerList->getNrPlayers(); p++)
   {
-  	Speler* speler = spelerslijst->getSpelerById(s);
-    ranglijstItem = new RanglijstItem();
-    ranglijstItem->spelerId = speler->id;
-    ranglijstItem->eigenwaarde = hoogsteEigenwaarde - s;
-    ranglijstItem->punten = ranglijstItem->eigenwaarde;
-    startRanglijst->voegItemToe(ranglijstItem);
+  	Player* player = playerList->getPlayerById(p);
+    rankingItem = new RankingItem();
+    rankingItem->playerId = player->id;
+    rankingItem->eigenvalue = highestEigenvalue - p;
+    rankingItem->points = rankingItem->eigenvalue;
+    initialRanking->addItem(rankingItem);
   }
   
-  return startRanglijst;
+  return initialRanking;
 }

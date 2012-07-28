@@ -1,5 +1,5 @@
-#ifndef SPELER_H
-#define SPELER_H
+#ifndef PLAYER_H
+#define PLAYER_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -22,16 +22,16 @@
 
 #include <string>
 
-class Speler
+class Player
 {
   public:
-  Speler();
-  Speler(std::string spelersnaam) : naam(spelersnaam) {}
-  virtual ~Speler();
+  Player();
+  Player(std::string playerName) : name(playerName) {}
+  virtual ~Player();
   
   unsigned int id;
-  std::string naam;
+  std::string name;
 };
 
-#endif // SPELER_H
+#endif // PLAYER_H
 

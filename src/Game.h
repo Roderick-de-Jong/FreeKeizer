@@ -1,5 +1,5 @@
-#ifndef PARTIJ_H
-#define PARTIJ_H
+#ifndef GAME_H
+#define GAME_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -26,27 +26,27 @@
  * Representatie van (de uitslag van) één individuele schaakpartij.
  * Wordt zowel gebruikt bij het indelen van partijen als het verwerken van uitslagen.
  */
-class Partij
+class Game
 {
 	public:
-	Partij();
-	virtual ~Partij();
+	Game();
+	virtual ~Game();
 	
 	/**
 	* Het unieke ID van de witspeler.
 	*/
-	int idWit;
+	int idWhite;
 	
 	/**
 	* Het unieke ID van de zwartspeler, of -1 bij geen zwartspeler, bijv. bij een vrije ronde.
 	*/
-	int idZwart;
+	int idBlack;
 	
 	/**
 	* Code die aangeeft wat de uitslag van de partij was.
 	*/
-	enum PartijResultaat resultaat;
+	enum GameResult result;
 };
 
-#endif // PARTIJ_H
+#endif // GAME_H
 

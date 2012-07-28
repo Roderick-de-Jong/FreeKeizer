@@ -19,13 +19,13 @@
 
 #include "Game.h"
 
-Partij::Partij()
+Game::Game()
 {
-  idWit = -1;
-  idZwart = -1;
+  idWhite = -1;
+  idBlack = -1;
 }
 
-Partij::~Partij()
+Game::~Game()
 {
 }
 

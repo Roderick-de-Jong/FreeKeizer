@@ -1,5 +1,5 @@
-#ifndef COMPETITIE_H
-#define COMPETITIE_H
+#ifndef COMPETITION_H
+#define COMPETITION_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -32,7 +32,7 @@
 #include "PlayerList.h"
 
 // Forward declarations
-class KeizerIO;
+class IOServices;
 
 
 
@@ -58,11 +58,11 @@ class KeizerIO;
 /**
  * Kern van het Keizerprogramma; beheert de datastructuren, bevat het Keizeralgoritme, en biedt een API aan.
  */
-class Competitie
+class Competition
 {
 	public:
-	Competitie();
-	virtual ~Competitie();
+	Competition();
+	virtual ~Competition();
 	// TODO: copy constructor, operator=
 	
 	
@@ -71,7 +71,7 @@ class Competitie
 	/**
 	 * Leest één of meerdere bestanden met competitiegegevens.
 	 */
-	virtual void leesCompetitieDatabase();
+	virtual void readCompetitionDatabase();
 	
 	/**
 	 * Voegt een lege Ronde aan de competitie toe.
@@ -79,14 +79,14 @@ class Competitie
 	 * of met een combinatie van beide.
 	 * TODO: zorgen dat dit alleen aangeroepen kan worden als de vorige ronde voltooid is
 	 */
-	virtual void nieuweRonde();
+	virtual void newRound();
 	
 	/**
 	 * Neemt de meest recente ronde en alle spelers die nog niet ingedeeld zijn
 	 * in die ronde, en probeert de ronde aan te vullen met partijen tussen die
 	 * spelers.
 	 */
-	virtual void maakIndeling();
+	virtual void generatePairing();
 	
 	// TODO: mutators voor simpele operaties, zodat een GUI gebouwd kan worden voor FreeKeizer
 	// TODO: batch mode, zodat niet na elke simpele operatie de stand herberekend wordt
@@ -104,25 +104,25 @@ class Competitie
 	/**
 	 * Geeft het totaal aantal gespeelde rondes in deze competitie.
 	 */
-	virtual unsigned int getNrRondes();
+	virtual unsigned int getNrRounds();
 	
 	/**
 	 * Retourneert een kopie van de lijst met spelers in de competitie.
 	 */
-	virtual std::auto_ptr<Spelerslijst> getSpelerslijst();
+	virtual std::auto_ptr<PlayerList> getPlayerList();
 	
 	/**
 	 * Retourneert een kopie van de ranglijst na de gevraagde ronde.
 	 * @param ronde Geeft aan welke ranglijst gewenst is; bereik is [0;n] waarbij n het aantal gespeelde rondes is in deze competitie.
 	 */
-	virtual std::auto_ptr<Ranglijst> getRanglijstNaRonde(unsigned int ronde);
+	virtual std::auto_ptr<Ranking> getRankingAfterRound(unsigned int round);
 	
 	/**
 	 * Retourneert een kopie van de partijen (incl. uitslagen) van de gevraagde ronde.
 	 * @param ronde Geeft aan voor welke ronde de uitslag gevraagd wordt; bereik is [0;n] waarbij n het aantal gespeelde rondes is in deze competitie.
 	 * TODO: opvragen van uitslag ronde 0 illegaal maken? Da's een NULL pointer namelijk.
 	 */
-	virtual std::auto_ptr<Ronde> getRonde(unsigned int ronde);
+	virtual std::auto_ptr<Round> getRound(unsigned int round);
 
 	
 	
@@ -133,7 +133,7 @@ class Competitie
 	 * @param ronde Geeft aan welke ranglijst gebruikt moet worden; gebruikt wordt de ranglijst van direct na de gegeven ronde. Geef ronde 0 op voor de beginranglijst.
 	 * @see KeizerIO::writeRanglijstDocument()
 	 */
-	virtual void writeRanglijstDocument(unsigned int ronde);
+	virtual void writeRankingDocument(unsigned int round);
 	
 	/**
 	 * Geeft het Competitie object de mogelijkheid statusberichten en dergelijke aan de gebruiker te tonen of naar een logbestand te schrijven.
@@ -147,7 +147,7 @@ class Competitie
 	 *         de rondenummers als indices, dus bijvoorbeeld getTegenstanderLijst(x)[3] geeft de tegenstander van speler x in ronde 3. Belangrijk:
 	 *         getTegenstanderLijst(x)[r] is -1 voor r = 0 en tevens voor elke ronde r waarin speler x geen tegenstander had (bijv. vrije ronde of afwezig).
 	 */
-	virtual std::vector<int> getTegenstanderLijst(unsigned int spelerId);
+	virtual std::vector<int> getOpponentList(unsigned int playerId);
 	
 	
 	
@@ -159,13 +159,13 @@ class Competitie
 	 * Berekent de stand in de competitie na de huidige ronde (n).
 	 * Voert een gedeeltelijke herberekening (1 iteratie) uit m.b.v. de stand na ronde (n - 1).
 	 */
-	virtual void _berekenStand();
+	virtual void _calculateRankings();
 	
 	/**
 	 * Berekent de stand in de competitie na de gegeven ronde.
 	 * Voert een gedeeltelijke herberekening (1 iteratie) uit m.b.v. de stand voor die ronde.
 	 */
-	virtual void _berekenStandNaRonde(unsigned int ronde);
+	virtual void _calculateRankingAfterRound(unsigned int round);
 	
 	/**
 	 * Hulpfunctie voor berekenStandNaRonde(); verwerkt de uitslag van 1 partij in de gegeven ranglijst.
@@ -173,7 +173,7 @@ class Competitie
 	 * @param waarderingsRanglijst De bron van te gebruiken eigenwaarden.
 	 * @param nieuweRanglijst De ranglijst waarin de partij moet worden opgenomen; dit is zowel een invoer- als uitvoerparameter.
 	 */
-	virtual void _verwerkPartij(Partij* partij, Ranglijst* waarderingsRanglijst, Ranglijst* nieuweRanglijst);
+	virtual void _processGame(Game* game, Ranking* valuationRanking, Ranking* updatedRanking);
 	
 	/**
 	 * Hulpfunctie voor berekenStandNaRonde(); zoekt uit wie er afwezig was in een gegeven ronde en geeft die personen eventueel wat punten.
@@ -181,12 +181,12 @@ class Competitie
 	 * @param waarderingsRanglijst De bron van te gebruiken eigenwaarden.
 	 * @param nieuweRanglijst De te wijzigen ranglijst waarin eventueel punten moeten worden toebedeeld voor afwezigheid.
 	 */
-	virtual void _verwerkAfwezigeSpelers(Ronde* ronde, Ranglijst* waarderingsRanglijst, Ranglijst* nieuweRanglijst);
+	virtual void _processAbsentPlayers(Round* round, Ranking* valuationRanking, Ranking* updatedRanking);
 	
 	/**
 	 * Vult de datastructuur _tegenstandersPerSpeler m.b.v. de uitslagen in _rondes.
 	 */
-	virtual void _vulTegenstanderLijsten();
+	virtual void _fillOpponentLists();
 	
 	
 	
@@ -200,38 +200,38 @@ class Competitie
 	/**
 	 * Hulpobject voor het delegeren van IO taken.
 	 */
-	KeizerIO* _keizerIO;
+	IOServices* _ioServices;
 	
 	std::auto_ptr<CompetitieParameters> _competitieParameters;
 
 	/**
 	 * De spelers die deelnemen aan de competitie.
 	 */
-	Spelerslijst _spelerslijst;
+	PlayerList _playerList;
 
 	/**
 	 * Geeft aan hoeveel rondes er gespeeld zijn.
 	 * TODO: weg-refactoren, en _rondes.size() gebruiken!!
 	 */	
-	unsigned int _nrRondes;
+	unsigned int _nrRounds;
 	
 	/**
 	 * _rondes[n] bevat de uitslag van ronde n voor n > 0, en _rondes[0] is NULL.
 	 */
-	std::vector<Ronde*> _rondes;
+	std::vector<Round*> _rounds;
 	
 	/**
 	 * _ranglijstNaRonde[0] is de beginranglijst, en _ranglijstNaRonde[n] is de ranglijst na ronde n.
 	 */
-	std::vector<Ranglijst*> _ranglijstNaRonde;
+	std::vector<Ranking*> _rankingAfterRound;
 	
 	/**
 	 * Hulpdatastructuur om makkelijk op te kunnen zoeken tegen wie een gegeven speler allemaal gespeeld heeft.
 	 * Element _tegenstandersPerSpeler[x] is een vector van speler-IDs geïndexeerd op ronde-nummer.
 	 * Element _tegenstandersPerSpeler[x][r] geeft dus het speler-ID van de tegenstander van speler x in ronde r.
 	 */
-	std::vector<std::vector<int> > _tegenstandersPerSpeler;
+	std::vector<std::vector<int> > _opponentPerPlayer;
 };
 
-#endif // COMPETITIE_H
+#endif // COMPETITION_H
 

@@ -1,5 +1,5 @@
-#ifndef INDELER_H
-#define INDELER_H
+#ifndef PAIRINGGENERATOR_H
+#define PAIRINGGENERATOR_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -21,22 +21,23 @@
  *************************************************************************/
 
 #include "Competition.h"
+#include "Round.h"
 
 
 /**
  * Produceert mogelijke indelingen voor de volgende ronde van een competitie.
  * Dit is een abstract class.
  */
-class Indeler
+class PairingGenerator
 {
 	public:
-	Indeler(Competitie* competitie);
-	virtual ~Indeler() { }
+	PairingGenerator(Competition* competition);
+	virtual ~PairingGenerator() { }
 	
-	virtual Ronde* maakIndeling() = 0;
+	virtual Round* generate() = 0;
 	
 	protected:
-	Competitie* _competitie;
+	Competition* _competition;
 };
 
-#endif /* INDELER_H */
+#endif /* PAIRINGGENERATOR_H */

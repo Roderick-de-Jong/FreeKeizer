@@ -1,5 +1,5 @@
-#ifndef RANGLIJST_H
-#define RANGLIJST_H
+#ifndef RANKING_H
+#define RANKING_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -28,7 +28,7 @@
 /**
  * Representatie van de stand in de competitie na een bepaalde ronde.
  */
-class Ranglijst
+class Ranking
 {
 	friend class FreeKeizerUnittest;
 	
@@ -36,77 +36,77 @@ class Ranglijst
 	/**
 	 * Default constructor. Construeert een lege ranglijst.
 	 */
-	Ranglijst();
+	Ranking();
 	
 	/**
 	 * Copy constructor. Dupliceert de gegeven ranglijst.
 	 * De individuele RanglijstItem objecten worden gekopiëerd, dus er wordt geen geheugen gedeelt tussen de originele en nieuwe Ranglijst objecten.
 	 */
-	Ranglijst(Ranglijst& original);
+	Ranking(Ranking& original);
 	
 	/**
 	 * Destructor.
 	 */
-	virtual ~Ranglijst();
+	virtual ~Ranking();
 
 	/**
 	 * Assignment operator.
 	 */
-	Ranglijst& operator=(const Ranglijst& original);
+	Ranking& operator=(const Ranking& original);
 
 	/**
 	 * Geeft het aantal plaatsen op de ranglijst.
 	 * Dit is hetzelfde als het aantal spelers in de competitie.
 	 */
-	virtual unsigned int getLengte();
+	virtual unsigned int getLength();
 
 	/**
 	 * Geeft een pointer naar de data voor de speler die op de gegeven plaats op de ranglijst staat.
 	 * @param plaats De plaats op de ranglijst, bereik [1;n] waarbij n het aantal spelers in de competitie is.
 	 */
-	virtual RanglijstItem* getItemOpPlaats(unsigned int plaats);
+	virtual RankingItem* getItemAtPlace(unsigned int place);
 	
 	/**
 	 * Geeft een pointer naar de data voor de gevraagde speler.
 	 * @param spelerId Het unieke id van de speler in kwestie.
 	 * @throw invalid_argument Als de gegeven speler niet voorkomt in de ranglijst.
 	 */
-	virtual RanglijstItem* getRanglijstItemBySpelerId(unsigned int spelerId);
+	virtual RankingItem* getRankingItemByPlayerId(unsigned int playerId);
 
-	virtual void voegItemToe(RanglijstItem* item);
+	virtual void addItem(RankingItem* item);
 
 	/**
 	 * Sorteert de ranglijst op Keizerpunten en past daarop de eigenwaarden aan.
 	 */
-	virtual void sorteer();
+	virtual void sort();
 	
 	/**
 	 * Geeft de ranglijst weer op ge gegeven outputstream.
 	 * @param spelersLijst Spelerslijst om de namen van spelers in op te zoeken.
 	 * @param outputStream Een pointer naar een willekeurig ostream object (bijvoorbeeld cout); mag NULL zijn (dan komt er geen output).
 	 */
-	virtual void dump(Spelerslijst* spelersLijst, std::ostream* outputStream);
+	virtual void dump(PlayerList* playerList, std::ostream* outputStream);
 	
 	/**
 	 * Hulpfunctie voor sorteer().
 	 */
-	static bool compareRanglijstItems(RanglijstItem* a, RanglijstItem* b);
+	static bool compareRankingItems(RankingItem* a, RankingItem* b);
 	
-	static Ranglijst* maakStartRanglijst(int hoogsteEigenwaarde, Spelerslijst* spelerslijst);
+	static Ranking* createInitialRanking(int highestEigenvalue, PlayerList* playerList);
 	
 	protected:
 	
 	/**
 	 * Maakt de ranglijst leeg. Hulpfunctie voor de destructor en assignment operator.
 	 */
-	virtual void _verwijderAlleItems();
+	virtual void _deleteAllItems();
 	
 	/**
 	 * De datastructuur met de daadwerkelijke ranglijst.
 	 * Het RanglijstItem voor de hoogst geplaatste / beste speler staat in _items[0], de op-één-na-beste speler in _items[1], etc. 
 	 */
-	std::vector<RanglijstItem*> _items;
+	std::vector<RankingItem*> _items;
 };
 
-#endif // RANGLIJST_H
+#endif // RANKING_H
 

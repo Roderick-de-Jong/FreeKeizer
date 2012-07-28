@@ -1,5 +1,5 @@
-#ifndef RONDE_H
-#define RONDE_H
+#ifndef ROUND_H
+#define ROUND_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -32,24 +32,24 @@
  * Kan worden gebruikt voor zowel het registreren en opslaan van uitslagen als het maken
  * van een indeling voor een ronde.
  */
-class Ronde
+class Round
 {
 	public:
-	Ronde();
-	virtual ~Ronde();
+	Round();
+	virtual ~Round();
 	
 	/**
 	 * Geeft aan of alle partijen van deze ronde gespeeld zijn.
 	 * @return false als er nog minstens 1 partij is met waarde NOG_TE_SPELEN
 	 *         true als er 0 partijen zijn met waarde NOG_TE_SPELEN
 	 */
-	virtual bool isVoltooid();
+	virtual bool isCompleted();
 	
-	virtual void dump(Spelerslijst* spelerslijst, std::ostream* outputStream);
+	virtual void dump(PlayerList* playerList, std::ostream* outputStream);
 
-	std::string datum;
-	std::vector<Partij*> partijen;
+	std::string date;
+	std::vector<Game*> games;
 };
 
-#endif // RONDE_H
+#endif // ROUND_H
 

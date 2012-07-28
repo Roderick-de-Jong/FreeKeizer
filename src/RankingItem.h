@@ -1,5 +1,5 @@
-#ifndef RANGLIJSTITEM_H
-#define RANGLIJSTITEM_H
+#ifndef RANKINGITEM_H
+#define RANKINGITEM_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -29,58 +29,58 @@
  * Definitie: nrAanwezig = nrGespeeld + nrVrijeRondes
  * Definitie: nrGespeeld = nrGewonnen + nrRemise + nrVerloren = nrWit + nrZwart
  */
-class RanglijstItem
+class RankingItem
 {
 	public:
 
 	/**
 	* Default constructor.
 	*/
-	RanglijstItem();
+	RankingItem();
 
 	/**
 	* Copy constructor.
 	*/
-	RanglijstItem(RanglijstItem& original) : spelerId(original.spelerId), punten(original.punten), eigenwaarde(original.eigenwaarde), nrPartijenGespeeld(original.nrPartijenGespeeld),
-	                                       nrPartijenGewonnen(original.nrPartijenGewonnen), nrPartijenRemise(original.nrPartijenRemise), nrPartijenVerloren(original.nrPartijenVerloren),
-                                           nrVrijeRondes(original.nrVrijeRondes), nrAfwezig(original.nrAfwezig), wedstrijdPunten(original.wedstrijdPunten),
-                                           nrPartijenWit(original.nrPartijenWit), nrPartijenZwart(original.nrPartijenZwart)
+	RankingItem(RankingItem& original) : playerId(original.playerId), points(original.points), eigenvalue(original.eigenvalue), nrGamesPlayed(original.nrGamesPlayed),
+	                                       nrGamesWon(original.nrGamesWon), nrGamesDrawn(original.nrGamesDrawn), nrGamesLost(original.nrGamesLost),
+                                           nrRoundsFree(original.nrRoundsFree), nrAbsent(original.nrAbsent), score(original.score),
+                                           nrGamesWhite(original.nrGamesWhite), nrGamesBlack(original.nrGamesBlack)
 	{
 		
 	}
   
-  virtual ~RanglijstItem();
+  virtual ~RankingItem();
   
   /**
    * Assignment operator.
    */
-  RanglijstItem& operator=(const RanglijstItem& original);
+  RankingItem& operator=(const RankingItem& original);
   
   /**
    * Geeft de plaats van de speler op de ranglijst aan. De hoogste (beste) plaats is 1.
    */
-  int plaats;
+  int place;
   
   /**
    * Het unieke ID van de speler op deze plaats op de ranglijst.
    */
-  unsigned int spelerId;
+  unsigned int playerId;
   
   /**
    * Het totaal aantal verzamelde keizerpunten van deze speler.
    */
-  int punten;
-  int eigenwaarde;
-  int nrPartijenGespeeld;
-  int nrPartijenGewonnen;
-  int nrPartijenRemise;
-  int nrPartijenVerloren;
-  int nrVrijeRondes;
-  int nrAfwezig;
-  float wedstrijdPunten;
-  int nrPartijenWit;
-  int nrPartijenZwart;
+  int points;
+  int eigenvalue;
+  int nrGamesPlayed;
+  int nrGamesWon;
+  int nrGamesDrawn;
+  int nrGamesLost;
+  int nrRoundsFree;
+  int nrAbsent;
+  float score;
+  int nrGamesWhite;
+  int nrGamesBlack;
 };
 
-#endif // RANGLIJSTITEM_H
+#endif // RANKINGITEM_H
 

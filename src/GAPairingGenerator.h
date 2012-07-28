@@ -1,5 +1,5 @@
-#ifndef INDELERGENETICALGORITHM_H
-#define INDELERGENETICALGORITHM_H
+#ifndef GAPAIRINGGENERATOR_H
+#define GAPAIRINGGENERATOR_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -23,13 +23,13 @@
 #include "PairingGenerator.h"
 #include "GeneticAlgorithm.h"
 
-class IndelerGeneticAlgorithm : public Indeler
+class GAPairingGenerator : public PairingGenerator
 {
 	public:
-	IndelerGeneticAlgorithm(Competitie* competitie);
-	virtual ~IndelerGeneticAlgorithm();
+	GAPairingGenerator(Competition* competition);
+	virtual ~GAPairingGenerator();
 	
-	virtual Ronde* maakIndeling();
+	virtual Round* generate();
 };
 
-#endif /* INDELERGENETICALGORITHM_H */
+#endif /* GAPAIRINGGENERATOR_H */

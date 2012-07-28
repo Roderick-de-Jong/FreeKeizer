@@ -19,11 +19,11 @@
 
 #include "Player.h"
 
-Speler::Speler()
+Player::Player()
 {
 }
 
-Speler::~Speler()
+Player::~Player()
 {
 }
 

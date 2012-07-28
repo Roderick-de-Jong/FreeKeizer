@@ -34,23 +34,23 @@
 //#define DEBUG_DUMP_STARTRANGLIJST
 //#define DEBUG_DUMP_UITSLAGEN
 
-Competitie::Competitie()
+Competition::Competition()
 {
 	_logStream = NULL;
-	_nrRondes = 0;
-	_keizerIO = new KeizerIO();
-	_rondes.push_back(NULL); // Ronde 0 bestaat niet.
+	_nrRounds = 0;
+	_ioServices = new IOServices();
+	_rounds.push_back(NULL); // Round 0 doesn't actually exist.
 }
 
-Competitie::~Competitie()
+Competition::~Competition()
 {
-	delete _keizerIO;
-	_keizerIO = NULL; // TODO: make it an auto_ptr
+	delete _ioServices;
+	_ioServices = NULL; // TODO: make it an auto_ptr
 }
 
 
 
-void Competitie::leesCompetitieDatabase()
+void Competition::readCompetitionDatabase()
 {
 	if(_logStream != NULL)
 	{
@@ -58,8 +58,8 @@ void Competitie::leesCompetitieDatabase()
 		_logStream->flush();
 	}
 	
-	_competitieParameters = _keizerIO->leesCompetitieParameters();
-	_nrRondes = _competitieParameters->aantalRondes;
+	_competitieParameters = _ioServices->leesCompetitieParameters();
+	_nrRounds = _competitieParameters->aantalRondes;
 	
 	if(_logStream != NULL)
 	{
@@ -71,26 +71,26 @@ void Competitie::leesCompetitieDatabase()
 		_logStream->flush();
 	}
 		
-	_keizerIO->leesSpelers(&_spelerslijst);
+	_ioServices->readPlayers(&_playerList);
 	
 	if(_logStream != NULL)
 	{
 #ifdef DEBUG_DUMP_SPELERSLIJST
 		(*_logStream) << std::endl;
-		_spelerslijst.dump(_logStream);
+		_playerList.dump(_logStream);
 #endif		
 		(*_logStream) << std::endl << "Bezig met opstellen van startranglijst..."; 
 		_logStream->flush();
 	}
 	
-	_ranglijstNaRonde.clear(); // TODO: vervangen door VOLLEDIGE RESET-FUNCTIE!!
-	_ranglijstNaRonde.push_back(Ranglijst::maakStartRanglijst(_competitieParameters->hoogsteEigenwaarde, &_spelerslijst));
+	_rankingAfterRound.clear(); // TODO: vervangen door VOLLEDIGE RESET-FUNCTIE!!
+	_rankingAfterRound.push_back(Ranking::createInitialRanking(_competitieParameters->hoogsteEigenwaarde, &_playerList));
 	
 	if(_logStream != NULL)
 	{
 #ifdef DEBUG_DUMP_STARTRANGLIJST
 		(*_logStream) << std::endl;
-		_ranglijstNaRonde[0]->dump(&_spelerslijst, _logStream);
+		rankingAfterRound[0]->dump(&_playerList, _logStream);
 #endif
 		(*_logStream) << std::endl << "Bezig met lezen van ronde-uitslagen..." << std::endl;
 	}
@@ -102,13 +102,13 @@ void Competitie::leesCompetitieDatabase()
     	(*_logStream) << "Bezig met lezen van uitslag voor ronde: " << r;
     	_logStream->flush();
     }
-    Ronde* ronde = _keizerIO->leesRonde(r);
-    _rondes.push_back(ronde);
+    Round* round = _ioServices->readRound(r);
+    _rounds.push_back(round);
     if(_logStream != NULL)
 	{
     	(*_logStream) << std::endl;
 #ifdef DEBUG_DUMP_UITSLAGEN
-		ronde->dump(&_spelerslijst, _logStream);
+		round->dump(&_playerList, _logStream);
 #endif
 	}
   }
@@ -116,7 +116,7 @@ void Competitie::leesCompetitieDatabase()
   if(_logStream != NULL)
 		(*_logStream) << "Klaar met inlezen van competitiedatabase. Bezig met berekenen van competitiestand..." << std::endl;
   
-  _berekenStand();
+  _calculateRankings();
   
   if(_logStream != NULL)
 		(*_logStream) << "Klaar met berekenen." << std::endl;
@@ -124,7 +124,7 @@ void Competitie::leesCompetitieDatabase()
 
 
 
-void Competitie::nieuweRonde()
+void Competition::newRound()
 {
 	if(_logStream != NULL)
 	{
@@ -132,7 +132,7 @@ void Competitie::nieuweRonde()
 		_logStream->flush();
 	}
 	
-	_rondes.push_back(new Ronde());
+	_rounds.push_back(new Round());
 	
 	if(_logStream != NULL)
 		(*_logStream) << "OK" << std::endl;
@@ -140,23 +140,23 @@ void Competitie::nieuweRonde()
 
 
 
-void Competitie::maakIndeling()
+void Competition::generatePairing()
 {
 	if(_logStream != NULL)
 		(*_logStream) << "Bezig met maken van indeling..." << std::endl;
 	
-	std::auto_ptr<IndelerGeneticAlgorithm> indeler(new IndelerGeneticAlgorithm(this));
+	std::auto_ptr<GAPairingGenerator> pairingGenerator(new GAPairingGenerator(this));
 	
-	// Neem de partiële indeling:
-	Ronde* vastgelegdePartijen = _rondes.back();
-	// Verkrijg een volledige indeling
-	Ronde* ronde = indeler->maakIndeling();
+	// Take the partial pairing:
+	Round* fixedGames = _rounds.back();
+	// Obtain a full pairing:
+	Round* round = pairingGenerator->generate();
 	
-	// Vervang de oude indeling door de nieuwe
-	_rondes.pop_back();
-	delete vastgelegdePartijen;
-	vastgelegdePartijen = NULL;
-	_rondes.push_back(ronde);
+	// Replace the old pairing with the new one
+	_rounds.pop_back();
+	delete fixedGames;
+	fixedGames = NULL;
+	_rounds.push_back(round);
 	
 	if(_logStream != NULL)
 		(*_logStream) << "Klaar met maken van indeling." << std::endl;
@@ -164,60 +164,60 @@ void Competitie::maakIndeling()
 
 
 
-std::auto_ptr<CompetitieParameters> Competitie::getCompetitieParameters()
+std::auto_ptr<CompetitieParameters> Competition::getCompetitieParameters()
 {
 	return std::auto_ptr<CompetitieParameters>(new CompetitieParameters(*_competitieParameters));
 }
 
 
 
-unsigned int Competitie::getNrRondes()
+unsigned int Competition::getNrRounds()
 {
-	return _nrRondes;
+	return _nrRounds;
 }
 
 
 
-std::auto_ptr<Spelerslijst> Competitie::getSpelerslijst()
+std::auto_ptr<PlayerList> Competition::getPlayerList()
 {
-	return std::auto_ptr<Spelerslijst>(new Spelerslijst(_spelerslijst));
+	return std::auto_ptr<PlayerList>(new PlayerList(_playerList));
 }
 
 
 
-void Competitie::setLogStream(std::ostream* stream)
+void Competition::setLogStream(std::ostream* stream)
 {
 	_logStream = stream;
 }
 
 
 
-std::auto_ptr<Ranglijst> Competitie::getRanglijstNaRonde(unsigned int ronde)
+std::auto_ptr<Ranking> Competition::getRankingAfterRound(unsigned int round)
 {
-	if(ronde > _nrRondes)
+	if(round > _nrRounds)
 		throw std::invalid_argument("Kan geen ranglijst geven voor een nog niet gespeelde ronde.");
 		
-	return std::auto_ptr<Ranglijst>(new Ranglijst(*_ranglijstNaRonde.at(ronde)));
+	return std::auto_ptr<Ranking>(new Ranking(*_rankingAfterRound.at(round)));
 }
 
 
 
-std::auto_ptr<Ronde> Competitie::getRonde(unsigned int ronde)
+std::auto_ptr<Round> Competition::getRound(unsigned int round)
 {
-	if(ronde > _rondes.size())
+	if(round > _rounds.size())
 		throw std::invalid_argument("Kan geen rondes uit de toekomst geven.");
 	
-	return std::auto_ptr<Ronde>(new Ronde(*_rondes.at(ronde)));
+	return std::auto_ptr<Round>(new Round(*_rounds.at(round)));
 }
 
 
 
-void Competitie::writeRanglijstDocument(unsigned int ronde)
+void Competition::writeRankingDocument(unsigned int round)
 {
 	if(_logStream != NULL)
 		(*_logStream) << "Bezig met schrijven van ranglijstdocument..."; _logStream->flush();
 	
-	_keizerIO->writeRanglijstDocument(this, ronde);
+	_ioServices->writeRankingDocument(this, round);
 	
 	if(_logStream != NULL)
 		(*_logStream) << "OK" << std::endl;
@@ -225,151 +225,151 @@ void Competitie::writeRanglijstDocument(unsigned int ronde)
 
 
 
-void Competitie::_berekenStand()
+void Competition::_calculateRankings()
 {
 	if(_logStream != NULL)
 		(*_logStream) << "Bezig met doorberekenen van de competitie..." << std::endl;
 	
 	// Sanity checks
-	if(_rondes.size() < _nrRondes)
+	if(_rounds.size() < _nrRounds)
 		throw std::logic_error("Kan stand niet berekenen - er missen uitslagen in de competitie.");
 
-	// Vorige versie van de ranglijsten verwijderen
-	for(unsigned int r = 1; r < _ranglijstNaRonde.size(); r++)  // Sla index 0 over (bewaar de startranglijst)
+	// Delete previous versions of the rankings
+	for(unsigned int r = 1; r < _rankingAfterRound.size(); r++)  // Preserve index 0 (save initial rankings)
 	{
-		delete _ranglijstNaRonde[r];
-		_ranglijstNaRonde[r] = NULL;
+		delete _rankingAfterRound[r];
+		_rankingAfterRound[r] = NULL;
 	}
-	_ranglijstNaRonde.resize(_nrRondes + 1); // Startranglijst + nieuwe ranglijst na elke ronde
+	_rankingAfterRound.resize(_nrRounds + 1); // Initial ranking + 1 ranking after each round
 	
-	// Nieuwe ranglijsten berekenen
-	// TODO: eerst nagaan of de laatste ronde wel helemaal klaar is (middels .isVoltooid())!
-	for(unsigned int r = 1; r <= _nrRondes; r++)
-		_berekenStandNaRonde(r);
+	// Calculate new rankings
+	// TODO: first check whether the most recent round has been completed
+	for(unsigned int r = 1; r <= _nrRounds; r++)
+		_calculateRankingAfterRound(r);
 }
 
 
 
-void Competitie::_berekenStandNaRonde(unsigned int ronde)
+void Competition::_calculateRankingAfterRound(unsigned int round)
 {
-	Ranglijst* waarderingsRanglijst;
+	Ranking* valuationRanking;
 	
 	if(_logStream != NULL)
-		(*_logStream) << "Bezig met berekenen van stand na ronde " << ronde << "..." << std::endl;
+		(*_logStream) << "Bezig met berekenen van stand na ronde " << round << "..." << std::endl;
 	
-	waarderingsRanglijst = _ranglijstNaRonde[ronde - 1];
+	valuationRanking = _rankingAfterRound[round - 1];
 
-	// Begin met een kopie van de startranglijst
-	Ranglijst* nieuweRanglijst = new Ranglijst(*_ranglijstNaRonde[0]);
+	// Start with a copy of the initial rankings
+	Ranking* updatedRanking = new Ranking(*_rankingAfterRound[0]);
 
-	// Verwerk alle partijen van de betreffende ronde
-	for(unsigned int r = 1; r <= ronde; r++)
+	// Process all games up til the given round
+	for(unsigned int r = 1; r <= round; r++)
 	{
-		Ronde* objRonde = _rondes[r];
-		for(unsigned int p = 0; p < objRonde->partijen.size(); p++)
-			_verwerkPartij(objRonde->partijen.at(p), waarderingsRanglijst, nieuweRanglijst);
-		_verwerkAfwezigeSpelers(objRonde, waarderingsRanglijst, nieuweRanglijst);
+		Round* objRound = _rounds[r];
+		for(unsigned int g = 0; g < objRound->games.size(); g++)
+			_processGame(objRound->games.at(g), valuationRanking, updatedRanking);
+		_processAbsentPlayers(objRound, valuationRanking, updatedRanking);
 	}
 	
-	// Sorteer op keizerpunten en update alle eigenwaarden
-	nieuweRanglijst->sorteer();
+	// Sort on keizerpoints and update all eigenvalues
+	updatedRanking->sort();
 	
-	// Sla de ranglijst op.
-	_ranglijstNaRonde[ronde] = nieuweRanglijst;
+	// Save the rankings
+	_rankingAfterRound[round] = updatedRanking;
 }
 
 
 
-void Competitie::_verwerkPartij(Partij* partij, Ranglijst* waarderingsRanglijst, Ranglijst* nieuweRanglijst)
+void Competition::_processGame(Game* game, Ranking* valuationRanking, Ranking* updatedRanking)
 {
-	Speler* witSpeler = _spelerslijst.getSpelerById(partij->idWit);
-	Speler* zwartSpeler = NULL;
-	RanglijstItem* waarderingsRanglijstItemWit = waarderingsRanglijst->getRanglijstItemBySpelerId(witSpeler->id);
-	RanglijstItem* waarderingsRanglijstItemZwart = NULL;
-	RanglijstItem* nieuweRanglijstItemWit = nieuweRanglijst->getRanglijstItemBySpelerId(witSpeler->id);
-	RanglijstItem* nieuweRanglijstItemZwart = NULL;
-	if(partij->idZwart >= 0)
+	Player* playerWhite = _playerList.getPlayerById(game->idWhite);
+	Player* playerBlack = NULL;
+	RankingItem* valuationRankingItemWhite = valuationRanking->getRankingItemByPlayerId(playerWhite->id);
+	RankingItem* valuationRankingItemBlack = NULL;
+	RankingItem* updatedRankingItemWhite = updatedRanking->getRankingItemByPlayerId(playerWhite->id);
+	RankingItem* updatedRankingItemBlack = NULL;
+	if(game->idBlack >= 0)
 	{
-		zwartSpeler = _spelerslijst.getSpelerById(partij->idZwart);
-		waarderingsRanglijstItemZwart = waarderingsRanglijst->getRanglijstItemBySpelerId(zwartSpeler->id);
-		nieuweRanglijstItemZwart = nieuweRanglijst->getRanglijstItemBySpelerId(zwartSpeler->id);
+		playerBlack = _playerList.getPlayerById(game->idBlack);
+		valuationRankingItemBlack = valuationRanking->getRankingItemByPlayerId(playerBlack->id);
+		updatedRankingItemBlack = updatedRanking->getRankingItemByPlayerId(playerBlack->id);
 	}
 	
-	double puntenVerhogingWit = 0;
-	double puntenVerhogingZwart = 0;
-	switch(partij->resultaat)
+	double pointIncreaseWhite = 0;
+	double pointIncreaseBlack = 0;
+	switch(game->result)
 	{
-		case WIT_WINT:
-			puntenVerhogingWit = WINST_FACTOR * waarderingsRanglijstItemZwart->eigenwaarde;
-			puntenVerhogingZwart = VERLIES_FACTOR * waarderingsRanglijstItemWit->eigenwaarde;
-			nieuweRanglijstItemWit->nrPartijenGewonnen++;
-			nieuweRanglijstItemZwart->nrPartijenVerloren++;
-			nieuweRanglijstItemWit->wedstrijdPunten += 1;
+		case WHITE_WINS:
+			pointIncreaseWhite = WIN_FACTOR  * valuationRankingItemBlack->eigenvalue;
+			pointIncreaseBlack = LOSS_FACTOR * valuationRankingItemWhite->eigenvalue;
+			updatedRankingItemWhite->nrGamesWon++;
+			updatedRankingItemBlack->nrGamesLost++;
+			updatedRankingItemWhite->score += 1;
 			break;
-		case ZWART_WINT:
-			puntenVerhogingWit = VERLIES_FACTOR * waarderingsRanglijstItemZwart->eigenwaarde;
-			puntenVerhogingZwart = WINST_FACTOR * waarderingsRanglijstItemWit->eigenwaarde;
-			nieuweRanglijstItemWit->nrPartijenVerloren++;
-			nieuweRanglijstItemZwart->nrPartijenGewonnen++;
-			nieuweRanglijstItemZwart->wedstrijdPunten += 1;
+		case BLACK_WINS:
+			pointIncreaseWhite = LOSS_FACTOR * valuationRankingItemBlack->eigenvalue;
+			pointIncreaseBlack = WIN_FACTOR  * valuationRankingItemWhite->eigenvalue;
+			updatedRankingItemWhite->nrGamesLost++;
+			updatedRankingItemBlack->nrGamesWon++;
+			updatedRankingItemBlack->score += 1;
 			break;
-		case REMISE:
-			puntenVerhogingWit = REMISE_FACTOR * waarderingsRanglijstItemZwart->eigenwaarde;
-			puntenVerhogingZwart = REMISE_FACTOR * waarderingsRanglijstItemWit->eigenwaarde;
-			nieuweRanglijstItemWit->nrPartijenRemise++;
-			nieuweRanglijstItemZwart->nrPartijenRemise++;
-			nieuweRanglijstItemWit->wedstrijdPunten += 0.5;
-			nieuweRanglijstItemZwart->wedstrijdPunten += 0.5;
+		case DRAW:
+			pointIncreaseWhite = DRAW_FACTOR * valuationRankingItemBlack->eigenvalue;
+			pointIncreaseBlack = DRAW_FACTOR * valuationRankingItemWhite->eigenvalue;
+			updatedRankingItemWhite->nrGamesDrawn++;
+			updatedRankingItemBlack->nrGamesDrawn++;
+			updatedRankingItemWhite->score += 0.5;
+			updatedRankingItemBlack->score += 0.5;
 			break;
-		case VRIJE_RONDE:
-			puntenVerhogingWit = VRIJE_RONDE_FACTOR * waarderingsRanglijstItemWit->eigenwaarde;
-			nieuweRanglijstItemWit->nrVrijeRondes++;
+		case FREE:
+			pointIncreaseWhite = FREE_FACTOR * valuationRankingItemWhite->eigenvalue;
+			updatedRankingItemWhite->nrRoundsFree++;
 			break;
 		default:
 			throw std::logic_error("Ongedefiniëerd resultaat tegengekomen bij verwerken partij-uitslag.");
 			break;
 	}
 	
-	if(partij->resultaat != VRIJE_RONDE)
+	if(game->result != FREE)
 	{
-		nieuweRanglijstItemWit->nrPartijenGespeeld++;
-		nieuweRanglijstItemZwart->nrPartijenGespeeld++;
-		nieuweRanglijstItemWit->nrPartijenWit++;
-		nieuweRanglijstItemZwart->nrPartijenZwart++;
+		updatedRankingItemWhite->nrGamesPlayed++;
+		updatedRankingItemBlack->nrGamesPlayed++;
+		updatedRankingItemWhite->nrGamesWhite++;
+		updatedRankingItemBlack->nrGamesBlack++;
 	}
 	
-	nieuweRanglijstItemWit->punten = lround(nieuweRanglijstItemWit->punten + puntenVerhogingWit);
-	if(zwartSpeler != NULL)
-		nieuweRanglijstItemZwart->punten = lround(nieuweRanglijstItemZwart->punten + puntenVerhogingZwart);
+	updatedRankingItemWhite->points = lround(updatedRankingItemWhite->points + pointIncreaseWhite);
+	if(playerBlack != NULL)
+		updatedRankingItemBlack->points = lround(updatedRankingItemBlack->points + pointIncreaseBlack);
 }
 
 
 
-void Competitie::_verwerkAfwezigeSpelers(Ronde* ronde, Ranglijst* waarderingsRanglijst, Ranglijst* nieuweRanglijst)
+void Competition::_processAbsentPlayers(Round* round, Ranking* valuationRanking, Ranking* updatedRanking)
 {
-	// Aanwezige spelers bepalen
-	std::set<int> aanwezigeSpelers;
-	for(unsigned int p = 0; p < ronde->partijen.size(); p++)
+	// Determine the players that are present
+	std::set<int> presentPlayers;
+	for(unsigned int g = 0; g < round->games.size(); g++)
 	{
-		Partij* partij = ronde->partijen[p];
-		aanwezigeSpelers.insert(partij->idWit);
-		if(partij->idZwart >= 0)
-			aanwezigeSpelers.insert(partij->idZwart);
+		Game* game = round->games[g];
+		presentPlayers.insert(game->idWhite);
+		if(game->idBlack >= 0)
+			presentPlayers.insert(game->idBlack);
 	}
 
-	// Ranglijst doorlopen op zoek naar afwezige spelers
-	for(unsigned int plaats = 1; plaats <= nieuweRanglijst->getLengte(); plaats++)
+	// Traverse ranking in search of absent players
+	for(unsigned int place = 1; place <= updatedRanking->getLength(); place++)
 	{
-		RanglijstItem* ranglijstItem = nieuweRanglijst->getItemOpPlaats(plaats);
-		int spelerId = ranglijstItem->spelerId;
-		if(aanwezigeSpelers.find(spelerId) == aanwezigeSpelers.end()) // Speler afwezig?
+		RankingItem* rankingItem = updatedRanking->getItemAtPlace(place);
+		int playerId = rankingItem->playerId;
+		if(presentPlayers.find(playerId) == presentPlayers.end()) // Player absent?
 		{
-			ranglijstItem->nrAfwezig++;
-			// Eventueel een beetje punten toekennen voor afwezigheid, indien niet te vaak afwezig geweest en indien reeds 1 keer aanwezig geweest dit seizoen
-			if(ranglijstItem->nrAfwezig <= MAX_AFWEZIG && ranglijstItem->nrPartijenGespeeld > 0)
+			rankingItem->nrAbsent++;
+			// Perhaps award some points for being absent, if the player hasn't been absent too often.
+			if(rankingItem->nrAbsent <= MAX_ROUNDS_ABSENT && rankingItem->nrGamesPlayed > 0)
 			{
-				int eigenwaarde = waarderingsRanglijst->getRanglijstItemBySpelerId(spelerId)->eigenwaarde;
-				ranglijstItem->punten = lround(ranglijstItem->punten + AFWEZIG_FACTOR * eigenwaarde);
+				int eigenvalue = valuationRanking->getRankingItemByPlayerId(playerId)->eigenvalue;
+				rankingItem->points = lround(rankingItem->points + ABSENT_FACTOR * eigenvalue);
 			}
 		}
 	}
@@ -377,41 +377,41 @@ void Competitie::_verwerkAfwezigeSpelers(Ronde* ronde, Ranglijst* waarderingsRan
 
 
 
-void Competitie::_vulTegenstanderLijsten()
+void Competition::_fillOpponentLists()
 {
 	std::vector<int> emptyVector;
 	
-	_tegenstandersPerSpeler.clear();
+	_opponentPerPlayer.clear();
 	
-	// Initialiseer alle spelerslijsten met de waarde voor "geen tegenstander"
-	for(unsigned int s = 0; s < _spelerslijst.getNrSpelers(); s++)
+	// Initialise all player lists with the value for 'no opponent'.
+	for(unsigned int p = 0; p < _playerList.getNrPlayers(); p++)
 	{
-		_tegenstandersPerSpeler.push_back(emptyVector);
-		_tegenstandersPerSpeler.at(s).resize(_nrRondes + 1, GEEN_SPELER); // _nrRondes + 1 omdat ronde 0 niet bestaat
+		_opponentPerPlayer.push_back(emptyVector);
+		_opponentPerPlayer.at(p).resize(_nrRounds + 1, NO_PLAYER); // _nrRondes + 1 omdat ronde 0 niet bestaat
 	}
 	
-	// Verwerk de uitslagen
-	for(unsigned int r = 1; r <= _nrRondes; r++)
+	// Process the game results
+	for(unsigned int r = 1; r <= _nrRounds; r++)
 	{
-		Ronde* ronde = _rondes.at(r);
-		for(unsigned int p = 0; p < ronde->partijen.size(); p++)
+		Round* round = _rounds.at(r);
+		for(unsigned int g = 0; g < round->games.size(); g++)
 		{
-			Partij* partij = ronde->partijen.at(p);
-			_tegenstandersPerSpeler.at(partij->idWit).at(r) = partij->idZwart; // Werkt omdat idWit altijd een geldig speler-ID is
-			if(partij->idZwart != GEEN_SPELER)
-				_tegenstandersPerSpeler.at(partij->idZwart).at(r) = partij->idWit;
+			Game* game = round->games.at(g);
+			_opponentPerPlayer.at(game->idWhite).at(r) = game->idBlack;
+			if(game->idBlack != NO_PLAYER)
+				_opponentPerPlayer.at(game->idBlack).at(r) = game->idWhite;
 		}
 	}
 }
 
 
 
-std::vector<int> Competitie::getTegenstanderLijst(unsigned int spelerId)
+std::vector<int> Competition::getOpponentList(unsigned int playerId)
 {
-	if(spelerId >= _tegenstandersPerSpeler.size())
+	if(playerId >= _opponentPerPlayer.size())
 		throw std::invalid_argument("Speler ID buiten bereik.");
 	
-	return _tegenstandersPerSpeler.at(spelerId);  // <3 Copy constructors
+	return _opponentPerPlayer.at(playerId);  // <3 Copy constructors
 }
 
 

@@ -20,57 +20,57 @@
 #include "Round.h"
 #include "PlayerList.h"
 
-Ronde::Ronde()
+Round::Round()
 {
 }
 
-Ronde::~Ronde()
+Round::~Round()
 {
-  for(unsigned int u = 0; u < partijen.size(); u++)
+  for(unsigned int u = 0; u < games.size(); u++)
   {
-    delete partijen[u];
-    partijen[u] = NULL;
+    delete games[u];
+    games[u] = NULL;
   }
-  partijen.clear();
+  games.clear();
 }
 
-bool Ronde::isVoltooid()
+bool Round::isCompleted()
 {
-	for(std::vector<Partij*>::iterator i = partijen.begin(); i != partijen.end(); i++)
-		if((*i)->resultaat == NOG_TE_SPELEN)
+	for(std::vector<Game*>::iterator i = games.begin(); i != games.end(); i++)
+		if((*i)->result == YET_TO_BE_PLAYED)
 			return false;
 	return true;
 }
 
-void Ronde::dump(Spelerslijst* spelerslijst, std::ostream* outputStream)
+void Round::dump(PlayerList* playerList, std::ostream* outputStream)
 {
-  Partij* partij = NULL;
-  Speler* witSpeler = NULL;
-  Speler* zwartSpeler = NULL;
+  Game* game = NULL;
+  Player* playerWhite = NULL;
+  Player* playerBlack = NULL;
   
   if(outputStream != NULL)
   {  
-	for(unsigned int p = 0; p < partijen.size(); p++)
+	for(unsigned int g = 0; g < games.size(); g++)
 	{
-		partij = partijen[p];
-		(*outputStream) << partij->resultaat << " " << partij->idWit << " " << partij->idZwart << " ---> ";
-			witSpeler = spelerslijst->getSpelerById(partij->idWit);
-			zwartSpeler = NULL;
-			if(partij->idZwart >= 0)
-				zwartSpeler = spelerslijst->getSpelerById(partij->idZwart);
-		switch(partij->resultaat)
+		game = games[g];
+		(*outputStream) << game->result << " " << game->idWhite << " " << game->idBlack << " ---> ";
+			playerWhite = playerList->getPlayerById(game->idWhite);
+			playerBlack = NULL;
+			if(game->idBlack >= 0)
+				playerBlack = playerList->getPlayerById(game->idBlack);
+		switch(game->result)
 		{
-		case WIT_WINT:
-			(*outputStream) << witSpeler->naam << " - " << zwartSpeler->naam << " 1 - 0" << std::endl;
+		case WHITE_WINS:
+			(*outputStream) << playerWhite->name << " - " << playerBlack->name << " 1 - 0" << std::endl;
 			break;
-		case ZWART_WINT:
-			(*outputStream) << witSpeler->naam << " - " << zwartSpeler->naam << " 0 - 1" << std::endl;
+		case BLACK_WINS:
+			(*outputStream) << playerWhite->name << " - " << playerBlack->name << " 0 - 1" << std::endl;
 			break;
-		case REMISE:
-			(*outputStream) << witSpeler->naam << " - " << zwartSpeler->naam << " 1/2 - 1/2" << std::endl;
+		case DRAW:
+			(*outputStream) << playerWhite->name << " - " << playerBlack->name << " 1/2 - 1/2" << std::endl;
 			break;
-		case VRIJE_RONDE:
-			(*outputStream) << witSpeler->naam  << " vrij" << std::endl;
+		case FREE:
+			(*outputStream) << playerWhite->name  << " vrij" << std::endl;
 			break;
 		default:
 			(*outputStream) << "Ongedefiniëerd resultaat." << std::endl;

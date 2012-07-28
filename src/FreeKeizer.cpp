@@ -48,11 +48,11 @@ int main(/* int argc, char** argv */)
 	
 	try
 	{
-		Competitie competitie;
-		competitie.setLogStream(&cout);
-		competitie.leesCompetitieDatabase();
+		Competition competition;
+		competition.setLogStream(&cout);
+		competition.readCompetitionDatabase();
 		
-		unsigned int aantalRondes = competitie.getNrRondes();
+		unsigned int aantalRondes = competition.getNrRounds();
 		
 		//auto_ptr<Spelerslijst> spelerslijst = competitie.getSpelerslijst();
 		//auto_ptr<Ranglijst> ranglijst = competitie.getRanglijstNaRonde(aantalRondes);
@@ -60,17 +60,17 @@ int main(/* int argc, char** argv */)
 		//ranglijst->dump(pSpelerslijst, &cout);
 		//delete pSpelerslijst;
 		
-		competitie.writeRanglijstDocument(aantalRondes);
+		competition.writeRankingDocument(aantalRondes);
 		
-		competitie.nieuweRonde();
+		competition.newRound();
 		aantalRondes++;
-		competitie.maakIndeling();
+		competition.generatePairing();
 		
 		// Toon de nieuwe indeling
 		cout << "--- Indeling ronde " << aantalRondes << " ---" << endl;
-		auto_ptr<Ronde> indeling = competitie.getRonde(aantalRondes); // vraag de nieuwe ronde op
-		auto_ptr<Spelerslijst> spelerslijst = competitie.getSpelerslijst();
-		Spelerslijst* pSpelerslijst = spelerslijst.release();
+		auto_ptr<Round> indeling = competition.getRound(aantalRondes); // vraag de nieuwe ronde op
+		auto_ptr<PlayerList> spelerslijst = competition.getPlayerList();
+		PlayerList* pSpelerslijst = spelerslijst.release();
 		indeling->dump(pSpelerslijst, &cout);
 		delete pSpelerslijst; pSpelerslijst = NULL;
 		cout << "-------------------------" << endl;

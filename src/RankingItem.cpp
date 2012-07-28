@@ -19,44 +19,44 @@
 
 #include "RankingItem.h"
 
-RanglijstItem::RanglijstItem()
+RankingItem::RankingItem()
 {
-	plaats = 0;
-	spelerId = -1;
-	punten = 0;
-	eigenwaarde = 0;
-	nrPartijenGespeeld = 0;
-	nrPartijenGewonnen = 0;
-	nrPartijenRemise = 0;
-	nrPartijenVerloren = 0;
-	nrVrijeRondes = 0;
-	nrAfwezig = 0;
-	wedstrijdPunten = 0;
-	nrPartijenWit = 0;
-	nrPartijenZwart = 0;
+	place = 0;
+	playerId = -1;
+	points = 0;
+	eigenvalue = 0;
+	nrGamesPlayed = 0;
+	nrGamesWon = 0;
+	nrGamesDrawn = 0;
+	nrGamesLost = 0;
+	nrRoundsFree = 0;
+	nrAbsent = 0;
+	score = 0;
+	nrGamesWhite = 0;
+	nrGamesBlack = 0;
 }
 
-RanglijstItem::~RanglijstItem()
+RankingItem::~RankingItem()
 {
 }
 
-RanglijstItem& RanglijstItem::operator=(const RanglijstItem& original)
+RankingItem& RankingItem::operator=(const RankingItem& original)
 {
 	if(this != &original)
 	{
-		plaats = original.plaats;
-		spelerId = original.spelerId;
-		punten = original.punten;
-		eigenwaarde = original.eigenwaarde;
-		nrPartijenGespeeld = original.nrPartijenGespeeld;
-		nrPartijenGewonnen = original.nrPartijenGewonnen;
-		nrPartijenRemise = original.nrPartijenRemise;
-		nrPartijenVerloren = original.nrPartijenVerloren;
-		nrVrijeRondes = original.nrVrijeRondes;
-		nrAfwezig = original.nrAfwezig;
-		wedstrijdPunten = original.wedstrijdPunten;
-		nrPartijenWit = original.nrPartijenWit;
-		nrPartijenZwart = original.nrPartijenZwart;		
+		place = original.place;
+		playerId = original.playerId;
+		points = original.points;
+		eigenvalue = original.eigenvalue;
+		nrGamesPlayed = original.nrGamesPlayed;
+		nrGamesWon = original.nrGamesWon;
+		nrGamesDrawn = original.nrGamesDrawn;
+		nrGamesLost = original.nrGamesLost;
+		nrRoundsFree = original.nrRoundsFree;
+		nrAbsent = original.nrAbsent;
+		score = original.score;
+		nrGamesWhite = original.nrGamesWhite;
+		nrGamesBlack = original.nrGamesBlack;		
 	}
 	
 	return *this;

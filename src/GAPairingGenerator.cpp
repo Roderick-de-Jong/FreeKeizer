@@ -19,23 +19,23 @@
 
 #include "GAPairingGenerator.h"
 
-IndelerGeneticAlgorithm::IndelerGeneticAlgorithm(Competitie* competitie)
-	: Indeler(competitie)
+GAPairingGenerator::GAPairingGenerator(Competition* competition)
+	: PairingGenerator(competition)
 {
 }
 
-IndelerGeneticAlgorithm::~IndelerGeneticAlgorithm()
+GAPairingGenerator::~GAPairingGenerator()
 {
 }
 
-Ronde* IndelerGeneticAlgorithm::maakIndeling()
+Round* GAPairingGenerator::generate()
 {
-	std::auto_ptr<Spelerslijst> spelerslijst(_competitie->getSpelerslijst());
+	std::auto_ptr<PlayerList> playerList(_competition->getPlayerList());
 	
 	// TODO: run genetic algorithm
 	
-	Ronde* ronde = new Ronde();
+	Round* round = new Round();
 	// TODO: store GA's result in Ronde object
 	
-	return ronde;
+	return round;
 }

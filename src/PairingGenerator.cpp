@@ -19,10 +19,10 @@
 
 #include "PairingGenerator.h"
 
-Indeler::Indeler(Competitie* competitie)
+PairingGenerator::PairingGenerator(Competition* competition)
 {
-	if(competitie == NULL)
+	if(competition == NULL)
 		throw std::invalid_argument("Indeler: competitie is NULL.");
 	
-	_competitie = competitie;
+	_competition = competition;
 }

@@ -1,17 +1,3 @@
-#include <string>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
-#include <memory>
-#include <iomanip>
-#include <assert.h>
-#include <string>
-#include <stdexcept>
-
-#include "IOServices.h"
-#include "CompetitieParameters.h"
-#include "Game.h"
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
  *                                                                       *
@@ -31,22 +17,38 @@
  *                                                                       *
  *************************************************************************/
 
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
+#include <memory>
+#include <iomanip>
+#include <assert.h>
+#include <string>
+#include <stdexcept>
+
+#include "IOServices.h"
+#include "CompetitieParameters.h"
+#include "Game.h"
 #include "Round.h"
 #include "PlayerList.h"
 
-KeizerIO::KeizerIO()
+
+
+IOServices::IOServices()
 {
 }
 
 
 
-KeizerIO::~KeizerIO()
+IOServices::~IOServices()
 {
 }
 
 
 
-std::auto_ptr<CompetitieParameters> KeizerIO::leesCompetitieParameters()
+std::auto_ptr<CompetitieParameters> IOServices::leesCompetitieParameters()
 {
   std::auto_ptr<CompetitieParameters> competitieParameters;
   std::ifstream invoerBestand;
@@ -71,11 +73,11 @@ std::auto_ptr<CompetitieParameters> KeizerIO::leesCompetitieParameters()
 
 
 
-void KeizerIO::leesSpelers(Spelerslijst* spelerslijst)
+void IOServices::readPlayers(PlayerList* playerList)
 {
   std::ifstream invoerBestand;
   int nrSpelers = 0;
-  Speler* speler = NULL;
+  Player* player = NULL;
   char tempNaam[256];
   
   invoerBestand.exceptions(std::ifstream::failbit | std::ifstream::badbit);  // Treat everything except EOF as an exception.
@@ -86,13 +88,13 @@ void KeizerIO::leesSpelers(Spelerslijst* spelerslijst)
   
   for(int s = 0; s < nrSpelers; s++)
   {
-    speler = new Speler();
-    invoerBestand >> speler->id;   // TODO: remove this, since player IDs are automatically assigned in order of addition
+    player = new Player();
+    invoerBestand >> player->id;   // TODO: remove this, since player IDs are automatically assigned in order of addition
     // Eet spaties alvorens getline te doen
     while(invoerBestand.peek() == ' ') { invoerBestand.get(); }
     invoerBestand.getline(tempNaam, 256);
-    speler->naam = std::string(tempNaam);
-    spelerslijst->voegSpelerToe(speler);
+    player->name = std::string(tempNaam);
+    playerList->addPlayer(player);
   }
   
   invoerBestand.close();
@@ -100,98 +102,98 @@ void KeizerIO::leesSpelers(Spelerslijst* spelerslijst)
 
 
 
-Ronde* KeizerIO::leesRonde(unsigned int r)
+Round* IOServices::readRound(unsigned int r)
 {
-	Ronde* ronde = new Ronde();
+	Round* round = new Round();
 	std::ostringstream bestandsnaam;
 	std::ifstream invoerBestand;
 	char datumBuffer[256];
 	int nrUitslagen = 0;
-	Partij* partij = NULL;
-	int intResultaat;
+	Game* game = NULL;
+	int intResult;
 	
 	invoerBestand.exceptions(std::ifstream::failbit | std::ifstream::badbit);  // Treat everything except EOF as an exception.
 	bestandsnaam << "input/Uitslag" << r << ".txt";
 	
 	invoerBestand.open(bestandsnaam.str().c_str(), std::ios::in);
 	invoerBestand.getline(datumBuffer, 256);
-	ronde->datum = datumBuffer;
+	round->date = datumBuffer;
 	
 	invoerBestand >> nrUitslagen;
 	for(int u = 0; u < nrUitslagen; u++)
 	{
-		partij = new Partij();
-		invoerBestand >> intResultaat;
-		partij->resultaat = static_cast<enum PartijResultaat>(intResultaat);
-		invoerBestand >> partij->idWit;
-		if(partij->resultaat == WIT_WINT || partij->resultaat == ZWART_WINT || partij->resultaat == REMISE)
+		game = new Game();
+		invoerBestand >> intResult;
+		game->result = static_cast<enum GameResult>(intResult);
+		invoerBestand >> game->idWhite;
+		if(game->result == WHITE_WINS || game->result == BLACK_WINS || game->result == DRAW)
 		{
 			// Betekent dat er een zwartspeler geweest moet zijn.
-			invoerBestand >> partij->idZwart;
+			invoerBestand >> game->idBlack;
 		}
-		ronde->partijen.push_back(partij);
+		round->games.push_back(game);
 	}
 	
 	invoerBestand.close();
 	
-	return ronde;
+	return round;
 }
 
 
 
-void KeizerIO::writeRanglijstDocument(Competitie* competitie, unsigned int ronde)
+void IOServices::writeRankingDocument(Competition* competition, unsigned int round)
 {
 	std::ostringstream bestandsnaam;
 	std::auto_ptr<CompetitieParameters> competitieParameters;
 	std::string competitieTitel;
 	std::ofstream document;
-	std::auto_ptr<Ranglijst> ranglijst;
-	std::auto_ptr<Ronde> uitslagAfgelopenRonde;
+	std::auto_ptr<Ranking> ranking;
+	std::auto_ptr<Round> uitslagAfgelopenRonde;
 	std::string datumAfgelopenRonde;
-	std::auto_ptr<Spelerslijst> spelerslijst;
+	std::auto_ptr<PlayerList> playerList;
 
 	// Sanity checks
-	if(competitie == NULL)
+	if(competition == NULL)
 		throw std::invalid_argument("Competitie is NULL");
-	if(ronde > competitie->getNrRondes())
+	if(round > competition->getNrRounds())
 		throw std::invalid_argument("Gevraagde ronde is nog niet gespeeld.");
 	
 	// Set up error handling
 	document.exceptions(std::ofstream::failbit | std::ofstream::badbit);  // Treat everything except EOF as an exception.
 	
 	// Gather some data
-	competitieParameters = competitie->getCompetitieParameters();
+	competitieParameters = competition->getCompetitieParameters();
 	if(competitieParameters->naam.empty())
 		competitieTitel = "Naamloze Competitie";
 	else
 		competitieTitel = competitieParameters->naam;
 		
-	ranglijst = competitie->getRanglijstNaRonde(ronde);
+	ranking = competition->getRankingAfterRound(round);
 	
-	if(ronde > 0)
+	if(round > 0)
 	{
-		uitslagAfgelopenRonde = competitie->getRonde(ronde);
-		datumAfgelopenRonde = uitslagAfgelopenRonde->datum;
+		uitslagAfgelopenRonde = competition->getRound(round);
+		datumAfgelopenRonde = uitslagAfgelopenRonde->date;
 	}
 	else
 	{
 		datumAfgelopenRonde = competitieParameters->startDatum;
 	}
 	
-	spelerslijst = competitie->getSpelerslijst();
+	playerList = competition->getPlayerList();
 
 	// Prepare output
-	bestandsnaam << "output/Ranglijst na ronde " << std::setw(4) << std::setfill('0') << ronde << ".html";
+	bestandsnaam << "output/Ranglijst na ronde " << std::setw(4) << std::setfill('0') << round << ".html";
 	document.open(bestandsnaam.str().c_str(), std::ios::out);
 	
-	document << "<html>\n<head>\n<title>Ranglijst na ronde " << ronde << "</title>\n"
+	document << "<html>\n<head>\n<title>Ranglijst na ronde " << round << "</title>\n"
 	         << "<style type=\"text/css\">\n"
 	         << "table {border: dotted; border-width: 1}\n"
 	         << "td {border: dotted; border-width: 1}\n"
 	         << "</style>\n"
 	         << "</head>\n"
 	         << "<body>\n<h1>" << competitieTitel << "</h1>\n"
-	         << "<h2>Ranglijst na ronde " << ronde << ", gespeeld op " << datumAfgelopenRonde << "</h2>\n"
+	         << "<h2>Ranglijst na ronde " << round << ", gespeeld op " << datumAfgelopenRonde << "</h2>\n"
 	         << "<table>\n"
 	         << "<tr><th>Plaats</th> <th>Naam speler</th> <th>Keizerpunten</th> <th>Eigenwaarde</th> "
 	         << "<th>Aantal gespeelde partijen</th> <th>Aantal gewonnen</th> <th>Aantal remises</th> "
@@ -199,49 +201,49 @@ void KeizerIO::writeRanglijstDocument(Competitie* competitie, unsigned int ronde
 	         << "<th>Wit</th> <th>Zwart</th></tr>\n"
 	         ;
 	
-	for(unsigned int p = 1; p <= ranglijst->getLengte(); p++)
+	for(unsigned int p = 1; p <= ranking->getLength(); p++)
 	{
-		RanglijstItem* ranglijstItem = ranglijst->getItemOpPlaats(p);
-		Speler* speler = spelerslijst->getSpelerById(ranglijstItem->spelerId);
-		document << "<tr><td style=\"text-align:right\">" << p << "</td> <td>" << speler->naam << "</td> "
-		         << "<td>" << ranglijstItem->punten << "</td> <td>" << ranglijstItem->eigenwaarde << "</td> "
-		         << "<td>" << ranglijstItem->nrPartijenGespeeld << "</td> <td>" << ranglijstItem->nrPartijenGewonnen << "</td> "
-		         << "<td>" << ranglijstItem->nrPartijenRemise << "</td> <td>" << ranglijstItem->nrPartijenVerloren << "</td>"
-		         << "<td>" << ranglijstItem->nrVrijeRondes << "</td> <td>" << ranglijstItem->wedstrijdPunten << "</td>"
-		         << "<td>" << ranglijstItem->nrPartijenWit << "</td> <td>" << ranglijstItem->nrPartijenZwart << "</td>"
+		RankingItem* rankingItem = ranking->getItemAtPlace(p);
+		Player* player = playerList->getPlayerById(rankingItem->playerId);
+		document << "<tr><td style=\"text-align:right\">" << p << "</td> <td>" << player->name << "</td> "
+		         << "<td>" << rankingItem->points << "</td> <td>" << rankingItem->eigenvalue << "</td> "
+		         << "<td>" << rankingItem->nrGamesPlayed << "</td> <td>" << rankingItem->nrGamesWon << "</td> "
+		         << "<td>" << rankingItem->nrGamesDrawn << "</td> <td>" << rankingItem->nrGamesLost << "</td>"
+		         << "<td>" << rankingItem->nrRoundsFree << "</td> <td>" << rankingItem->score << "</td>"
+		         << "<td>" << rankingItem->nrGamesWhite << "</td> <td>" << rankingItem->nrGamesBlack << "</td>"
 		         << "</tr>\n";
 	}
 
 	document << "</table>\n";
 	
 	// Is er al minstens 1 ronde gespeeld?
-	if(ronde > 0)
+	if(round > 0)
 	{
-		document << "<h2>Uitslagen ronde " << ronde << "</h2>\n"
+		document << "<h2>Uitslagen ronde " << round << "</h2>\n"
 		         << "<table>\n"
 		         << "<tr><th>Wit</th> <th>Zwart</th> <th>Uitslag</th></tr>\n";
 
-		for(unsigned int p = 0; p < uitslagAfgelopenRonde->partijen.size(); p++)
+		for(unsigned int p = 0; p < uitslagAfgelopenRonde->games.size(); p++)
 		{
 			std::string uitslagTekst;
-			Partij* partij = uitslagAfgelopenRonde->partijen.at(p);
-			std::string naamWit = spelerslijst->getSpelerById(partij->idWit)->naam;
+			Game* partij = uitslagAfgelopenRonde->games.at(p);
+			std::string naamWit = playerList->getPlayerById(partij->idWhite)->name;
 			std::string naamZwart;
-			if(partij->idZwart >= 0)
-				naamZwart = spelerslijst->getSpelerById(partij->idZwart)->naam;
+			if(partij->idBlack >= 0)
+				naamZwart = playerList->getPlayerById(partij->idBlack)->name;
 			
-			switch(partij->resultaat)
+			switch(partij->result)
 			{
-				case ZWART_WINT:
+				case BLACK_WINS:
 					uitslagTekst = "0 - 1";
 					break;
-				case WIT_WINT:
+				case WHITE_WINS:
 					uitslagTekst = "1 - 0";
 					break;
-				case REMISE:
+				case DRAW:
 					uitslagTekst = "1/2 - 1/2";
 					break;
-				case VRIJE_RONDE:
+				case FREE:
 					uitslagTekst = "vrij";
 					break;
 			}
@@ -259,14 +261,14 @@ void KeizerIO::writeRanglijstDocument(Competitie* competitie, unsigned int ronde
 
 
 
-void KeizerIO::writeKruistabel(Competitie* competitie, unsigned int ronde)
+void IOServices::writeCrossTable(Competition* competition, unsigned int round)
 {
 	std::ostringstream bestandsnaam;
 	std::ofstream document;
 	std::string competitieTitel;
-	std::auto_ptr<Spelerslijst> spelerslijst = competitie->getSpelerslijst();
-	std::auto_ptr<CompetitieParameters> competitieParameters = competitie->getCompetitieParameters();
-	unsigned int aantalSpelers = spelerslijst->getNrSpelers();
+	std::auto_ptr<PlayerList> spelerslijst = competition->getPlayerList();
+	std::auto_ptr<CompetitieParameters> competitieParameters = competition->getCompetitieParameters();
+	unsigned int aantalSpelers = spelerslijst->getNrPlayers();
 	
 	// Set up error handling.
 	document.exceptions(std::ofstream::failbit | std::ofstream::badbit);  // Treat everything except EOF as an exception.
@@ -286,48 +288,48 @@ void KeizerIO::writeKruistabel(Competitie* competitie, unsigned int ronde)
 	}
 	
 	// Kruistabel vullen
-	for(unsigned int r = 0; r < ronde; r++)
+	for(unsigned int r = 0; r < round; r++)
 	{
-		std::auto_ptr<Ronde> uitslagDezeRonde = competitie->getRonde(r);
-		for(unsigned int p = 0; p < uitslagDezeRonde->partijen.size(); p++)
+		std::auto_ptr<Round> uitslagDezeRonde = competition->getRound(r);
+		for(unsigned int p = 0; p < uitslagDezeRonde->games.size(); p++)
 		{
-			Partij* partij = uitslagDezeRonde->partijen[p];
-			if(partij->idWit < 0 || static_cast<unsigned int>(partij->idWit) >= aantalSpelers)
+			Game* partij = uitslagDezeRonde->games[p];
+			if(partij->idWhite < 0 || static_cast<unsigned int>(partij->idWhite) >= aantalSpelers)
 				throw std::logic_error("Ongeldig speler-ID voor witspeler gevonden bij vullen van kruistabel.");
-			switch(partij->resultaat)
+			switch(partij->result)
 			{
-				case WIT_WINT:
-					if(partij->idZwart < 0 || static_cast<unsigned int>(partij->idZwart) >= aantalSpelers)
+				case WHITE_WINS:
+					if(partij->idBlack < 0 || static_cast<unsigned int>(partij->idBlack) >= aantalSpelers)
 						throw std::logic_error("Ongeldig speler-ID voor zwartspeler gevonden bij vullen van kruistabel.");
-					kruistabel[partij->idWit][partij->idZwart] += 1;
+					kruistabel[partij->idWhite][partij->idBlack] += 1;
 					break;
-				case ZWART_WINT:
-					if(partij->idZwart < 0 || static_cast<unsigned int>(partij->idZwart) >= aantalSpelers)
+				case BLACK_WINS:
+					if(partij->idBlack < 0 || static_cast<unsigned int>(partij->idBlack) >= aantalSpelers)
 						throw std::logic_error("Ongeldig speler-ID voor zwartspeler gevonden bij vullen van kruistabel.");
-					kruistabel[partij->idZwart][partij->idWit] += 1;
+					kruistabel[partij->idBlack][partij->idWhite] += 1;
 					break;
-				case REMISE:
-					if(partij->idZwart < 0 || static_cast<unsigned int>(partij->idZwart) >= aantalSpelers)
+				case DRAW:
+					if(partij->idBlack < 0 || static_cast<unsigned int>(partij->idBlack) >= aantalSpelers)
 						throw std::logic_error("Ongeldig speler-ID voor zwartspeler gevonden bij vullen van kruistabel.");
-					kruistabel[partij->idWit][partij->idZwart] += 0.5;
-					kruistabel[partij->idZwart][partij->idWit] += 0.5;
+					kruistabel[partij->idWhite][partij->idBlack] += 0.5;
+					kruistabel[partij->idBlack][partij->idWhite] += 0.5;
 					break;
-				case VRIJE_RONDE:
-					kruistabel[partij->idWit][aantalSpelers] += 1;
+				case FREE:
+					kruistabel[partij->idWhite][aantalSpelers] += 1;
 					break;
 				default:
 					std::cerr << "Onbekend resultaat in uitslagen gevonden bij vullen van kruistabel!" << std::endl;
-					assert(partij->resultaat >= 0 && partij->resultaat <= 3);
+					assert(partij->result >= 0 && partij->result <= 3);
 					break;
 			}
 		}
 	}
 	
 	// Kruistabel uitvoeren
-	bestandsnaam << "output/Kruistabel na ronde " << std::setw(4) << std::setfill('0') << ronde << ".html";
+	bestandsnaam << "output/Kruistabel na ronde " << std::setw(4) << std::setfill('0') << round << ".html";
 	document.open(bestandsnaam.str().c_str(), std::ios::out);
 	
-	document << "<html>\n<head>\n<title>Kruistabel na ronde " << ronde << "</title>\n"
+	document << "<html>\n<head>\n<title>Kruistabel na ronde " << round << "</title>\n"
 	         << "<style type=\"text/css\">\n"
 	         << "table {border: dotted; border-width: 1}\n"
 	         << "td {border: dotted; border-width: 1}\n"
@@ -338,8 +340,8 @@ void KeizerIO::writeKruistabel(Competitie* competitie, unsigned int ronde)
 	         << "</style>\n"
 	         << "</head>\n"
 	         << "<body>\n<h1>" << competitieTitel << "</h1>\n"
-	         << "<h2>Kruistabel na ronde " << ronde << ", gespeeld op "
-	         << competitie->getRonde(ronde)->datum << "</h2>\n"
+	         << "<h2>Kruistabel na ronde " << round << ", gespeeld op "
+	         << competition->getRound(round)->date << "</h2>\n"
 	         << "<table>\n"
 	         << "<tr>\n"
 	         << "  <th rowspan=\"2\" style=\"vertical-align:bottom\">Naam speler</td>\n"
@@ -349,14 +351,14 @@ void KeizerIO::writeKruistabel(Competitie* competitie, unsigned int ronde)
 	document << "<tr style=\"height:100px\">\n";
 	for(unsigned int s = 0; s < aantalSpelers; s++)
 	{
-		document << "  <th><div class=\"naamTegenstander\">" << spelerslijst->getSpelerById(s)->naam << "</div></th>\n";
+		document << "  <th><div class=\"naamTegenstander\">" << spelerslijst->getPlayerById(s)->name << "</div></th>\n";
 	}
 	document << "<th><div class=\"naamTegenstander\">Vrije ronde</div></th>\n"
            << "</tr>\n";
 		
 	for(unsigned int s = 0; s < aantalSpelers; s++)
 	{
-		document << "<tr><td>" << spelerslijst->getSpelerById(s)->naam << "</td>";
+		document << "<tr><td>" << spelerslijst->getPlayerById(s)->name << "</td>";
 		for(unsigned int t = 0; t < aantalSpelers + 1; t++)
 		{
 			if(s == t)

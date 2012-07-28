@@ -21,84 +21,84 @@
 
 #include "PlayerList.h"
 
-Spelerslijst::Spelerslijst()
+PlayerList::PlayerList()
 {
 }
 
-Spelerslijst::Spelerslijst(Spelerslijst& original)
+PlayerList::PlayerList(PlayerList& original)
 {
-	_spelers.resize(original._spelers.size());
-	for(unsigned int s = 0; s < original._spelers.size(); s++)
-		_spelers.at(s) = new Speler(*original._spelers.at(s));
+	_players.resize(original._players.size());
+	for(unsigned int s = 0; s < original._players.size(); s++)
+		_players.at(s) = new Player(*original._players.at(s));
 }
 
-Spelerslijst::~Spelerslijst()
+PlayerList::~PlayerList()
 {
-	_verwijderAlleSpelers();
+	_deleteAllPlayers();
 }
 
-Spelerslijst& Spelerslijst::operator=(const Spelerslijst& original)
+PlayerList& PlayerList::operator=(const PlayerList& original)
 {
 	if(this != &original)
 	{
-		_verwijderAlleSpelers();
-		_spelers.resize(original._spelers.size());
-		for(unsigned int s = 0; s < original._spelers.size(); s++)
-			_spelers.at(s) = new Speler(*original._spelers.at(s));
+		_deleteAllPlayers();
+		_players.resize(original._players.size());
+		for(unsigned int s = 0; s < original._players.size(); s++)
+			_players.at(s) = new Player(*original._players.at(s));
 	}
 	
 	return *this;
 }
 
-Speler* Spelerslijst::getSpelerById(unsigned int spelerId)
+Player* PlayerList::getPlayerById(unsigned int playerId)
 {
-	return _spelers.at(spelerId);
+	return _players.at(playerId);
 }
 
-Speler* Spelerslijst::getSpelerByNaam(const std::string& spelerNaam)
+Player* PlayerList::getPlayerByName(const std::string& playerName)
 {
-	for(unsigned int s = 0; s < _spelers.size(); s++)
-		if(_spelers[s]->naam == spelerNaam)
-			return _spelers[s];
+	for(unsigned int s = 0; s < _players.size(); s++)
+		if(_players[s]->name == playerName)
+			return _players[s];
 	return NULL;
 }
 
-unsigned int Spelerslijst::getNrSpelers()
+unsigned int PlayerList::getNrPlayers()
 {
-	return _spelers.size();
+	return _players.size();
 }
 
-void Spelerslijst::voegSpelerToe(Speler* speler)
+void PlayerList::addPlayer(Player* player)
 {
-	_spelers.push_back(speler);
-	speler->id = _spelers.size() - 1;
+	_players.push_back(player);
+	player->id = _players.size() - 1;
 }
 
-void Spelerslijst::dump(std::ostream* outputStream)
+void PlayerList::dump(std::ostream* outputStream)
 {
-  Speler* speler = NULL;
+  Player* player = NULL;
   
   if(outputStream != NULL)
   {
 	(*outputStream) << "Spelerslijst:" << std::endl;
-	for(unsigned int s = 0; s < _spelers.size(); s++)
+	for(unsigned int s = 0; s < _players.size(); s++)
 	{
-		speler = _spelers.at(s);
-		(*outputStream) << speler->id << " " << speler->naam << std::endl;
+		player = _players.at(s);
+		(*outputStream) << player->id << " " << player->name << std::endl;
 	}
   }
 }
 
-void Spelerslijst::_verwijderAlleSpelers()
+void PlayerList::_deleteAllPlayers()
 {
-	for(unsigned int s = 0; s < _spelers.size(); s++)
+	for(unsigned int s = 0; s < _players.size(); s++)
 	{
-		if(_spelers[s] != NULL)
+		if(_players[s] != NULL)
 		{
-			delete _spelers[s];
-			_spelers[s] = NULL;
+			delete _players[s];
+			_players[s] = NULL;
 		}
 	}
-	_spelers.clear();
+	_players.clear();
 }
 

@@ -1,5 +1,5 @@
-#ifndef SPELERSLIJST_H
-#define SPELERSLIJST_H
+#ifndef PLAYERLIST_H
+#define PLAYERLIST_H
 
 /*************************************************************************
  * Copyright 2012 Roderick de Jong                                       *
@@ -30,7 +30,7 @@
 
 // TODO: IMPORTANT: add a (dummy) player 0 to the player database, now that player IDs start at 0!!!!!
 
-class Spelerslijst
+class PlayerList
 {
 	friend class FreeKeizerUnittest;
 	
@@ -39,34 +39,34 @@ class Spelerslijst
 	/**
 	 * Default constructor.
 	 */
-	Spelerslijst();
+	PlayerList();
 	
 	/**
 	 * Copy constructor.
 	 */
-	Spelerslijst(Spelerslijst& original);
+	PlayerList(PlayerList& original);
 	
 	/**
 	 * Destructor.
 	 */
-	virtual ~Spelerslijst();
+	virtual ~PlayerList();
 	
 	/**
 	 * Assignment operator.
 	 */
-	Spelerslijst& operator=(const Spelerslijst& original);
+	PlayerList& operator=(const PlayerList& original);
 	
-	virtual Speler* getSpelerById(unsigned int spelerId);
+	virtual Player* getPlayerById(unsigned int playerId);
 	
 	/**
 	 * Returns:
 	 * De speler met de naam in kwestie, of NULL indien niet gevonden.
 	 */
-	virtual Speler* getSpelerByNaam(const std::string& spelerNaam);
+	virtual Player* getPlayerByName(const std::string& playerName);
 
-	virtual unsigned int getNrSpelers();
+	virtual unsigned int getNrPlayers();
 	
-	virtual void voegSpelerToe(Speler* speler);
+	virtual void addPlayer(Player* player);
 	
 	/**
 	 * Geeft de spelerslijst weer op de gegeven outputstream.
@@ -75,10 +75,10 @@ class Spelerslijst
 	
 	protected:
 	
-	virtual void _verwijderAlleSpelers();
+	virtual void _deleteAllPlayers();
 	
-	std::vector<Speler*> _spelers;
+	std::vector<Player*> _players;
 };
 
-#endif // SPELERSLIJST_H
+#endif // PLAYERLIST_H
 

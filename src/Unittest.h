@@ -27,8 +27,8 @@ class FreeKeizerUnittest
 	FreeKeizerUnittest() {}
 	virtual ~FreeKeizerUnittest() {}
 	
-	virtual int testSpelerslijst();
-	virtual int testRanglijst();
+	virtual int testPlayerList();
+	virtual int testRanking();
 };
 
 #endif /* FREEKEIZER_UNITTEST_H */
