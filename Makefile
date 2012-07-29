@@ -1,6 +1,6 @@
 CC = g++
-CFLAGS = -Wall -Wextra -ggdb
-LINKFLAGS = -ggdb
+CFLAGS = -Wall -std=c++0x -Wextra -ggdb
+LINKFLAGS = -std=c++0x -ggdb
 RM = rm
 
 SRC_DIR = src
