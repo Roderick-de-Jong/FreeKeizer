@@ -25,12 +25,15 @@
 #include "RankingItem.h"
 #include "Unittest.h"
 
+namespace FreeKeizer
+{
+
 /**
  * Representatie van de stand in de competitie na een bepaalde ronde.
  */
 class Ranking
 {
-	friend class FreeKeizerUnittest;
+  friend class FreeKeizerUnittest;
 	
 	public:
 	/**
@@ -107,6 +110,8 @@ class Ranking
 	 */
 	std::vector<RankingItem*> _items;
 };
+
+}
 
 #endif // RANKING_H
 

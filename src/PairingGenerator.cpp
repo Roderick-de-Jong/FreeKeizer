@@ -19,10 +19,15 @@
 
 #include "PairingGenerator.h"
 
+namespace FreeKeizer
+{
+
 PairingGenerator::PairingGenerator(Competition* competition)
 {
 	if(competition == NULL)
 		throw std::invalid_argument("Indeler: competitie is NULL.");
 	
 	_competition = competition;
+}
+
 }

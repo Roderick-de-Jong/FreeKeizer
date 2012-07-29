@@ -21,6 +21,9 @@
 
 #include "PlayerList.h"
 
+namespace FreeKeizer
+{
+
 PlayerList::PlayerList()
 {
 }
@@ -102,3 +105,4 @@ void PlayerList::_deleteAllPlayers()
 	_players.clear();
 }
 
+}

@@ -27,6 +27,9 @@
 #include "Game.h"
 #include "PlayerList.h"
 
+namespace FreeKeizer
+{
+
 /**
  * Representeert de nog te spelen of reeds gespeelde partijen in een ronde van de competitie.
  * Kan worden gebruikt voor zowel het registreren en opslaan van uitslagen als het maken
@@ -50,6 +53,8 @@ class Round
 	std::string date;
 	std::vector<Game*> games;
 };
+
+}
 
 #endif // ROUND_H
 

@@ -29,6 +29,9 @@
 #include "ChessConstants.h"
 #include "GAPairingGenerator.h"
 
+namespace FreeKeizer
+{
+
 //#define DEBUG_DUMP_COMPETITIEPARAMETERS
 //#define DEBUG_DUMP_SPELERSLIJST
 //#define DEBUG_DUMP_STARTRANGLIJST
@@ -415,3 +418,4 @@ std::vector<int> Competition::getOpponentList(unsigned int playerId)
 }
 
 
+}

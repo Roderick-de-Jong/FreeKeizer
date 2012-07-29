@@ -20,6 +20,9 @@
 #include "Round.h"
 #include "PlayerList.h"
 
+namespace FreeKeizer
+{
+
 Round::Round()
 {
 }
@@ -78,4 +81,6 @@ void Round::dump(PlayerList* playerList, std::ostream* outputStream)
 		}
 	}
   }
+}
+
 }

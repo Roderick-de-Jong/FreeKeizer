@@ -19,6 +19,9 @@
 
 #include "Player.h"
 
+namespace FreeKeizer
+{
+
 Player::Player()
 {
 }
@@ -27,3 +30,4 @@ Player::~Player()
 {
 }
 
+}

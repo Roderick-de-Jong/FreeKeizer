@@ -20,6 +20,9 @@
  *                                                                       *
  *************************************************************************/
 
+namespace FreeKeizer
+{
+
 /**
  * Constants representing the result of a single game of chess.
  * TODO: create better values
@@ -47,6 +50,8 @@ const double DRAW_FACTOR        = (double) 3 / 6;  // Portion of opponent's eige
 const double FREE_FACTOR        = (double) 4 / 6;  // Portion of own eigenvalue awarded for a free round
 const double ABSENT_FACTOR      = (double) 2 / 6;  // Portion of own eigenvalue awarded when one is absent for a valid reason
 const int    MAX_ROUNDS_ABSENT  =              5;  // Max times someone is allowed to receive points while absent
+
+}
 
 #endif // CHESSCONSTANTS_H
 

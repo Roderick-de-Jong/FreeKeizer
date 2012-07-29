@@ -26,13 +26,14 @@
 #include "Player.h"
 #include "Unittest.h"
 
-
+namespace FreeKeizer
+{
 
 // TODO: IMPORTANT: add a (dummy) player 0 to the player database, now that player IDs start at 0!!!!!
 
 class PlayerList
 {
-	friend class FreeKeizerUnittest;
+  friend class FreeKeizerUnittest;
 	
 	public:
 	
@@ -79,6 +80,8 @@ class PlayerList
 	
 	std::vector<Player*> _players;
 };
+
+}
 
 #endif // PLAYERLIST_H
 

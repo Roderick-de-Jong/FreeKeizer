@@ -23,6 +23,9 @@
 #include "PairingGenerator.h"
 #include "GeneticAlgorithm.h"
 
+namespace FreeKeizer
+{
+
 class GAPairingGenerator : public PairingGenerator
 {
 	public:
@@ -31,5 +34,7 @@ class GAPairingGenerator : public PairingGenerator
 	
 	virtual Round* generate();
 };
+
+}
 
 #endif /* GAPAIRINGGENERATOR_H */

@@ -20,6 +20,9 @@
  *                                                                       *
  *************************************************************************/
 
+namespace FreeKeizer
+{
+
 class FreeKeizerUnittest
 {
 	public:
@@ -30,5 +33,7 @@ class FreeKeizerUnittest
 	virtual int testPlayerList();
 	virtual int testRanking();
 };
+
+}
 
 #endif /* FREEKEIZER_UNITTEST_H */

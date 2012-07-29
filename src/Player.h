@@ -22,6 +22,9 @@
 
 #include <string>
 
+namespace FreeKeizer
+{
+
 class Player
 {
   public:
@@ -33,5 +36,8 @@ class Player
   std::string name;
 };
 
+}
+
 #endif // PLAYER_H
+
 

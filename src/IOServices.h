@@ -29,6 +29,9 @@
 #include "Player.h"
 #include "PlayerList.h"
 
+namespace FreeKeizer
+{
+
 // Forward declarations
 class Competition;
 
@@ -75,6 +78,8 @@ class IOServices
 	 */
 	virtual void writeCrossTable(Competition* competition, unsigned int round);
 };
+
+}
 
 #endif // IOSERVICES_H
 

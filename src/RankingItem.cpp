@@ -19,6 +19,9 @@
 
 #include "RankingItem.h"
 
+namespace FreeKeizer
+{
+
 RankingItem::RankingItem()
 {
 	place = 0;
@@ -62,5 +65,6 @@ RankingItem& RankingItem::operator=(const RankingItem& original)
 	return *this;
 }
 
+}
 
 

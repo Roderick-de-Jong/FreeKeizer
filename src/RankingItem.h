@@ -22,6 +22,9 @@
 
 #include "PlayerList.h"
 
+namespace FreeKeizer
+{
+
 /**
  * Datastructuur voor één regel met spelersstatistieken op een ranglijst.
  *
@@ -81,6 +84,8 @@ class RankingItem
   int nrGamesWhite;
   int nrGamesBlack;
 };
+
+}
 
 #endif // RANKINGITEM_H
 

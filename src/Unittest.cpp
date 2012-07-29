@@ -30,6 +30,8 @@
 
 using namespace std;
 
+namespace FreeKeizer
+{
 
 
 int FreeKeizerUnittest::testPlayerList()
@@ -456,10 +458,13 @@ int FreeKeizerUnittest::testRanking()
 	return fails;
 }
 
+}
 
 
 int main(void)
 {
+  using namespace FreeKeizer;
+
 	FreeKeizerUnittest unittest;
 	int fails = 0;
 	

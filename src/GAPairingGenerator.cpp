@@ -19,6 +19,9 @@
 
 #include "GAPairingGenerator.h"
 
+namespace FreeKeizer
+{
+
 GAPairingGenerator::GAPairingGenerator(Competition* competition)
 	: PairingGenerator(competition)
 {
@@ -38,4 +41,6 @@ Round* GAPairingGenerator::generate()
 	// TODO: store GA's result in Ronde object
 	
 	return round;
+}
+
 }

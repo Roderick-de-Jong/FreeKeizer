@@ -36,7 +36,7 @@
 #include "PlayerList.h"
 
 using namespace std;
-
+using namespace FreeKeizer;
 
 
 int main(/* int argc, char** argv */)

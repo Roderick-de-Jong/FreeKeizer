@@ -24,6 +24,9 @@
 #include "Ranking.h"
 #include "RankingItem.h"
 
+namespace FreeKeizer
+{
+
 Ranking::Ranking()
 {
 }
@@ -185,4 +188,6 @@ Ranking* Ranking::createInitialRanking(int highestEigenvalue, PlayerList* player
   }
   
   return initialRanking;
+}
+
 }

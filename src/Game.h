@@ -22,6 +22,9 @@
 
 #include "ChessConstants.h"
 
+namespace FreeKeizer
+{
+
 /**
  * Representatie van (de uitslag van) één individuele schaakpartij.
  * Wordt zowel gebruikt bij het indelen van partijen als het verwerken van uitslagen.
@@ -47,5 +50,7 @@ class Game
 	*/
 	GameResult result;
 };
+
+}
 
 #endif // GAME_H

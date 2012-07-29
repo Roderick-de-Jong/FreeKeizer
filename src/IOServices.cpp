@@ -34,7 +34,8 @@
 #include "Round.h"
 #include "PlayerList.h"
 
-
+namespace FreeKeizer
+{
 
 IOServices::IOServices()
 {
@@ -389,3 +390,4 @@ void IOServices::writeCrossTable(Competition* competition, unsigned int round)
 	document.close();
 }
 
+}

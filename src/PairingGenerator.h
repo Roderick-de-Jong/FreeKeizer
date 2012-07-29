@@ -23,6 +23,8 @@
 #include "Competition.h"
 #include "Round.h"
 
+namespace FreeKeizer
+{
 
 /**
  * Produceert mogelijke indelingen voor de volgende ronde van een competitie.
@@ -39,5 +41,7 @@ class PairingGenerator
 	protected:
 	Competition* _competition;
 };
+
+}
 
 #endif /* PAIRINGGENERATOR_H */

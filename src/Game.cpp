@@ -19,6 +19,9 @@
 
 #include "Game.h"
 
+namespace FreeKeizer
+{
+
 Game::Game()
 {
   idWhite = -1;
@@ -29,3 +32,4 @@ Game::~Game()
 {
 }
 
+}

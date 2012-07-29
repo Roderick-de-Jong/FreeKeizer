@@ -31,6 +31,9 @@
 #include "Round.h"
 #include "PlayerList.h"
 
+namespace FreeKeizer
+{
+
 // Forward declarations
 class IOServices;
 
@@ -232,6 +235,8 @@ class Competition
 	 */
 	std::vector<std::vector<int> > _opponentPerPlayer;
 };
+
+}
 
 #endif // COMPETITION_H
 
