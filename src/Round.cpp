@@ -37,7 +37,7 @@ Round::~Round()
 bool Round::isCompleted()
 {
 	for(std::vector<Game*>::iterator i = games.begin(); i != games.end(); i++)
-		if((*i)->result == YET_TO_BE_PLAYED)
+		if((*i)->result == GameResult::YET_TO_BE_PLAYED)
 			return false;
 	return true;
 }
@@ -53,23 +53,23 @@ void Round::dump(PlayerList* playerList, std::ostream* outputStream)
 	for(unsigned int g = 0; g < games.size(); g++)
 	{
 		game = games[g];
-		(*outputStream) << game->result << " " << game->idWhite << " " << game->idBlack << " ---> ";
+		(*outputStream) << (int)(game->result) << " " << game->idWhite << " " << game->idBlack << " ---> ";
 			playerWhite = playerList->getPlayerById(game->idWhite);
 			playerBlack = NULL;
 			if(game->idBlack >= 0)
 				playerBlack = playerList->getPlayerById(game->idBlack);
 		switch(game->result)
 		{
-		case WHITE_WINS:
+		case GameResult::WHITE_WINS:
 			(*outputStream) << playerWhite->name << " - " << playerBlack->name << " 1 - 0" << std::endl;
 			break;
-		case BLACK_WINS:
+		case GameResult::BLACK_WINS:
 			(*outputStream) << playerWhite->name << " - " << playerBlack->name << " 0 - 1" << std::endl;
 			break;
-		case DRAW:
+		case GameResult::DRAW:
 			(*outputStream) << playerWhite->name << " - " << playerBlack->name << " 1/2 - 1/2" << std::endl;
 			break;
-		case FREE:
+		case GameResult::FREE:
 			(*outputStream) << playerWhite->name  << " vrij" << std::endl;
 			break;
 		default:

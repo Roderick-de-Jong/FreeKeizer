@@ -126,7 +126,7 @@ Round* IOServices::readRound(unsigned int r)
 		invoerBestand >> intResult;
 		game->result = static_cast<enum GameResult>(intResult);
 		invoerBestand >> game->idWhite;
-		if(game->result == WHITE_WINS || game->result == BLACK_WINS || game->result == DRAW)
+		if(game->result == GameResult::WHITE_WINS || game->result == GameResult::BLACK_WINS || game->result == GameResult::DRAW)
 		{
 			// Betekent dat er een zwartspeler geweest moet zijn.
 			invoerBestand >> game->idBlack;
@@ -234,16 +234,16 @@ void IOServices::writeRankingDocument(Competition* competition, unsigned int rou
 			
 			switch(partij->result)
 			{
-				case BLACK_WINS:
+				case GameResult::BLACK_WINS:
 					uitslagTekst = "0 - 1";
 					break;
-				case WHITE_WINS:
+				case GameResult::WHITE_WINS:
 					uitslagTekst = "1 - 0";
 					break;
-				case DRAW:
+				case GameResult::DRAW:
 					uitslagTekst = "1/2 - 1/2";
 					break;
-				case FREE:
+				case GameResult::FREE:
 					uitslagTekst = "vrij";
 					break;
 			}
@@ -298,28 +298,28 @@ void IOServices::writeCrossTable(Competition* competition, unsigned int round)
 				throw std::logic_error("Ongeldig speler-ID voor witspeler gevonden bij vullen van kruistabel.");
 			switch(partij->result)
 			{
-				case WHITE_WINS:
+				case GameResult::WHITE_WINS:
 					if(partij->idBlack < 0 || static_cast<unsigned int>(partij->idBlack) >= aantalSpelers)
 						throw std::logic_error("Ongeldig speler-ID voor zwartspeler gevonden bij vullen van kruistabel.");
 					kruistabel[partij->idWhite][partij->idBlack] += 1;
 					break;
-				case BLACK_WINS:
+				case GameResult::BLACK_WINS:
 					if(partij->idBlack < 0 || static_cast<unsigned int>(partij->idBlack) >= aantalSpelers)
 						throw std::logic_error("Ongeldig speler-ID voor zwartspeler gevonden bij vullen van kruistabel.");
 					kruistabel[partij->idBlack][partij->idWhite] += 1;
 					break;
-				case DRAW:
+				case GameResult::DRAW:
 					if(partij->idBlack < 0 || static_cast<unsigned int>(partij->idBlack) >= aantalSpelers)
 						throw std::logic_error("Ongeldig speler-ID voor zwartspeler gevonden bij vullen van kruistabel.");
 					kruistabel[partij->idWhite][partij->idBlack] += 0.5;
 					kruistabel[partij->idBlack][partij->idWhite] += 0.5;
 					break;
-				case FREE:
+				case GameResult::FREE:
 					kruistabel[partij->idWhite][aantalSpelers] += 1;
 					break;
 				default:
 					std::cerr << "Onbekend resultaat in uitslagen gevonden bij vullen van kruistabel!" << std::endl;
-					assert(partij->result >= 0 && partij->result <= 3);
+					//assert(partij->result >= 0 && partij->result <= 3);
 					break;
 			}
 		}

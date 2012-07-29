@@ -22,9 +22,10 @@
 
 /**
  * Constants representing the result of a single game of chess.
- * TODO: replace by more extensible class, for user-defined values
+ * TODO: create better values
+ * TODO: add methods for conversion to and from string
  */
-enum GameResult
+enum class GameResult
 {
 	BLACK_WINS = 0,
 	WHITE_WINS = 1,

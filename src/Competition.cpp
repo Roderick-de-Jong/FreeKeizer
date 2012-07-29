@@ -299,21 +299,21 @@ void Competition::_processGame(Game* game, Ranking* valuationRanking, Ranking* u
 	double pointIncreaseBlack = 0;
 	switch(game->result)
 	{
-		case WHITE_WINS:
+	case GameResult::WHITE_WINS:
 			pointIncreaseWhite = WIN_FACTOR  * valuationRankingItemBlack->eigenvalue;
 			pointIncreaseBlack = LOSS_FACTOR * valuationRankingItemWhite->eigenvalue;
 			updatedRankingItemWhite->nrGamesWon++;
 			updatedRankingItemBlack->nrGamesLost++;
 			updatedRankingItemWhite->score += 1;
 			break;
-		case BLACK_WINS:
+		case GameResult::BLACK_WINS:
 			pointIncreaseWhite = LOSS_FACTOR * valuationRankingItemBlack->eigenvalue;
 			pointIncreaseBlack = WIN_FACTOR  * valuationRankingItemWhite->eigenvalue;
 			updatedRankingItemWhite->nrGamesLost++;
 			updatedRankingItemBlack->nrGamesWon++;
 			updatedRankingItemBlack->score += 1;
 			break;
-		case DRAW:
+		case GameResult::DRAW:
 			pointIncreaseWhite = DRAW_FACTOR * valuationRankingItemBlack->eigenvalue;
 			pointIncreaseBlack = DRAW_FACTOR * valuationRankingItemWhite->eigenvalue;
 			updatedRankingItemWhite->nrGamesDrawn++;
@@ -321,7 +321,7 @@ void Competition::_processGame(Game* game, Ranking* valuationRanking, Ranking* u
 			updatedRankingItemWhite->score += 0.5;
 			updatedRankingItemBlack->score += 0.5;
 			break;
-		case FREE:
+		case GameResult::FREE:
 			pointIncreaseWhite = FREE_FACTOR * valuationRankingItemWhite->eigenvalue;
 			updatedRankingItemWhite->nrRoundsFree++;
 			break;
@@ -330,7 +330,7 @@ void Competition::_processGame(Game* game, Ranking* valuationRanking, Ranking* u
 			break;
 	}
 	
-	if(game->result != FREE)
+	if(game->result != GameResult::FREE)
 	{
 		updatedRankingItemWhite->nrGamesPlayed++;
 		updatedRankingItemBlack->nrGamesPlayed++;

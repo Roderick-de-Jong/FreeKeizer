@@ -45,8 +45,7 @@ class Game
 	/**
 	* Code die aangeeft wat de uitslag van de partij was.
 	*/
-	enum GameResult result;
+	GameResult result;
 };
 
 #endif // GAME_H
-
